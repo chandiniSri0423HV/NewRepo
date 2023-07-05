@@ -14,10 +14,6 @@ pipeline
                 '''
             }
         }
-->deployment/new integration ->create a basic integration
-->config of new connection ->create a rest connection of type T&I
-->config new lookup ->create a basic lookup of person details
-      
 		
      
 		stage('Deployement of an Integration'){
@@ -36,6 +32,15 @@ pipeline
                 '''
             }
         }
+		
+		stage('Configuring a new lookup')
+		{
+		steps { 
+				bat'''
+				curl -X POST --header "Authorization: Basic ZGV2b3BzX3VzZXI6T2ljX0plbmtpbnMjMjAyMw==" --form file=@C:/Docs/Git/NewRepo/PersonDetails.csv --form type=application/octet-stream https://testinstance-idevjxz332qf-ia.integration.ocp.oraclecloud.com/ic/api/integration/v1/lookups/archive
+				'''
+			}
+		}
 		
 		
 		stage('Activation of the integration')
