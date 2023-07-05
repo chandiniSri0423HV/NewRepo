@@ -1,0 +1,35 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Check if NEWINTEGRATION_NEWREPO_01.00.0000 is activated') {
+            steps {
+                script {
+                    def isActivated = false
+					
+                    if (!isActivated) {
+						curl -X POST --header "Authorization: Basic ZGV2b3BzX3VzZXI6T2ljX0plbmtpbnMjMjAyMw==" --header "Content-Type:application/json" --header "X-HTTP-Method-Override:PATCH" -d @C:/Docs/Git/NewRepo/Deactivate.json -d 'enableAsyncActivationMode=true' "https://testinstance-idevjxz332qf-ia.integration.ocp.oraclecloud.com/ic/api/integration/v1/integrations/NEWINTEGRATION_NEWREPO|01.00.0000"
+                        echo "NEWINTEGRATION_NEWREPO_01.00.0000 integration Deactivated"
+                    } 
+					else {
+                        echo "NEWINTEGRATION_NEWREPO_01.00.0000 integration is already Deactivated"
+                    }
+                }
+            }
+        }
+
+        stage('Import NEWINTEGRATION_NEWREPO_01.00.0001') {
+            steps {
+                curl --location "https://testinstance-idevjxz332qf-ia.integration.ocp.oraclecloud.com/ic/api/integration/v1/integrations/archive" --header "Authorization: Basic cG9jdXNlcjpIVk9JQ01heSMyMDIz" --form "file=@"NEWINTEGRATION_NEWREPO_01.00.0001.iar"
+                echo "NEWINTEGRATION_NEWREPO_01.00.0000 integration imported"
+            }
+        }
+
+        stage('Activate NEWINTEGRATION_NEWREPO_01.00.0001') {
+            steps {
+            curl --header "Authorization: Basic ZGV2b3BzX3VzZXI6T2ljX0plbmtpbnMjMjAyMw==" --header "Content-Type:application/json" --header "X-HTTP-Method-Override:PATCH" -d @C:/Docs/Git/NewRepo/Activate.json --location "https://testinstance-idevjxz332qf-ia.integration.ocp.oraclecloud.com/ic/api/integration/v1/integrations/NEWINTEGRATION_NEWREPO|01.00.0000"
+			echo "NEWINTEGRATION_NEWREPO_01.00.0000 integration activated"
+            }
+        }
+    }
+}
