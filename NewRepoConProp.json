@@ -1,0 +1,40 @@
+{
+	"connectionProperties": [
+		{
+			"displayName": "Connection URL",
+			"hasAttachment": false,
+			"hiddenFlag": false,
+			"propertyGroup": "CONNECTION_PROPS",
+			"propertyName": "connectionUrl",
+			"propertyShortDesc": "Please make sure that this value really corresponds to the type selected above.",
+			"propertyType": "URL",
+			"propertyValue": "https://testinstance-idevjxz332qf-ia.integration.ocp.oraclecloud.com/",
+			"requiredFlag": true
+		}
+	],
+	"securityPolicy": "BASIC_AUTH",
+	"securityProperties": [
+		{
+			"displayName": "Username",
+			"hasAttachment": false,
+			"hiddenFlag": false,
+			"propertyDescription": "A username credential",
+			"propertyGroup": "CREDENTIALS",
+			"propertyName": "username",
+			"propertyType": "STRING",
+			"propertyValue": "devops_user",
+			"requiredFlag": true
+		},
+		{
+			"displayName": "Password",
+			"hasAttachment": false,
+			"hiddenFlag": false,
+			"propertyDescription": "A password credential",
+			"propertyGroup": "CREDENTIALS",
+			"propertyName": "password",
+			"propertyType": "PASSWORD",
+			"propertyValue": "Oic_Jenkins#2023",
+			"requiredFlag": true
+		}
+	]
+}
