@@ -1,27 +1,17 @@
 pipeline{
 	agent any
 	stages{
-	stage('Check if 1.0.0 is activated') {
+	stage('Check if NEWINTEGRATION_NEWREPO_01.00.0001 is activated') {
             steps {
-script {
-    // Check activeStatus of NEWINTEGRATION_NEWREPO_01.00.0001
-    bat '''
-    for /F "tokens=*" %%A in ('curl -X GET --header "Authorization: Basic ZGV2b3BzX3VzZXI6T2ljX0plbmtpbnMjMjAyMw==" --header "Accept:application/json" "https://testinstance-idevjxz332qf-ia.integration.ocp.oraclecloud.com/ic/api/integration/v1/integrations/NEWINTEGRATION_NEWREPO^|01.00.0001/activationStatus"') do set status=%%A
-    '''
-    echo "Activation Status: ${env.status}"
-
-    if (env.status == "Active") {
-        // Deactivate NEWINTEGRATION_NEWREPO_01.00.0001 if it is active
-        bat '''
-        curl -X POST --header "Authorization: Basic ZGV2b3BzX3VzZXI6T2ljX0plbmtpbnMjMjAyMw==" --header "Content-Type:application/json" --header "X-HTTP-Method-Override:PATCH" -d @C:/Docs/Git/NewRepo/Deactivate.json -d "enableAsyncActivationMode=true" "https://testinstance-idevjxz332qf-ia.integration.ocp.oraclecloud.com/ic/api/integration/v1/integrations/NEWINTEGRATION_NEWREPO^|01.00.0001"
-        '''
-        echo "NEWINTEGRATION_NEWREPO_01.00.0001 integration deactivated"
-    } else {
-        echo "NEWINTEGRATION_NEWREPO_01.00.0001 integration is already deactivated"
-    }
-}
-
+                script {		
+					
+                        bat '''
+                        curl -X POST --header "Authorization: Basic ZGV2b3BzX3VzZXI6T2ljX0plbmtpbnMjMjAyMw==" --header "Content-Type:application/json" --header "X-HTTP-Method-Override:PATCH" -d @C:/Docs/Git/NewRepo/Deactivate.json -d "enableAsyncActivationMode=true" "https://testinstance-idevjxz332qf-ia.integration.ocp.oraclecloud.com/ic/api/integration/v1/integrations/NEWINTEGRATION_NEWREPO|01.00.0001"
+                        '''
+                        
+                }
             }
+        }
         }
 	stage('Importing and replacing the existed integration') {
             steps {
@@ -33,4 +23,4 @@ script {
 
         
     }
-}
+
