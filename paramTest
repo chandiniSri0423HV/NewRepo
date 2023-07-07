@@ -10,9 +10,8 @@ pipeline {
     stages {
         stage("Integration Deployment") {
             steps {
-                echo "$params.IntegrationFileName"
-				echo "$BasicAuthentication"
-				echo "${IntegrationArchiveURL}"
+                echo "$params.FileName"
+				echo "$params.BasicAuthentication"
 				bat'''
 				curl --location "https://testinstance-idevjxz332qf-ia.integration.ocp.oraclecloud.com/ic/api/integration/v1/integrations/archive" --header "Authorization: Basic cG9jdXNlcjpIVk9JQ01heSMyMDIz" --form "file=@"NEWINTEGRATION_NEWREPO_01.00.0000.iar"
 				'''
