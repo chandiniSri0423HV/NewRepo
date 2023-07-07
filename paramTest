@@ -11,7 +11,7 @@ pipeline {
             steps {
                 echo "$params.IntegrationFileName"
 				echo "$BasicAuthentication"
-				echo ${IntegrationArchiveURL}
+				echo "${IntegrationArchiveURL}"
             }
         }
         
