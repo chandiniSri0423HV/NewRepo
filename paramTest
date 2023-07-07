@@ -1,16 +1,21 @@
 pipeline{
 	agent any
-	stages{
-		stage('Deploying an integration'){
+	
+	properties([
 		parameters([
 			string(name:'IntegrationFileName', 
 					descriptiton:'Integration File Name',
-					defaultValue:'')
+					defaultValue:''),
 		])
-		echo "${IntegrationFileName}"
+	])
+	
+	stages{
+		stage('Deploying an integration'){
 		
-		bat'''
-		'''
+		steps{
+			echo "${IntegrationFileName}"
+		
+		}
 		}
 	}
 }
