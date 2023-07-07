@@ -1,22 +1,19 @@
-pipeline{
-	agent any
-	node(){
-	properties([
-		parameters([
-			string(name:'IntegrationFileName', 
-					descriptiton:'Integration File Name',
-					defaultValue:''),
-		])
-	])
-	
-	stages{
-		stage('Deploying an integration'){
-		
-		steps{
-			echo "${IntegrationFileName}"
-		
-		}
-		}
-	}
-}
+pipeline {
+    agent any
+    parameters {
+        string(name: "IntegrationFileName", defaultValue: "NEWINTEGRATION_NEWREPO_01.00.0000", description: "IntegrationFileName")
+        string(name: "BasicAuthentication", defaultValue: "Basic cG9jdXNlcjpIVk9JQ01heSMyMDIz", description: "BasicAuthentication")
+		string(name: "IntegrationArchiveURL", defaultValue: "https://testinstance-idevjxz332qf-ia.integration.ocp.oraclecloud.com/ic/api/integration/v1/integrations/archive", description: "IntegrationArchiveURL")
+
+    }
+    stages {
+        stage("Integration Deployment") {
+            steps {
+                echo "$params.IntegrationFileName"
+				echo "$BasicAuthentication"
+				echo ${IntegrationArchiveURL}
+            }
+        }
+        
+    }
 }
