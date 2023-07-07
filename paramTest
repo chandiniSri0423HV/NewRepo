@@ -5,13 +5,8 @@ pipeline
 		stage('Deployement of an Integration'){
 			steps{
 				script{
-				// def var1 = 'https://testinstance-idevjxz332qf-ia.integration.ocp.oraclecloud.com'
-				// echo "before : ${var1}"
-				// var1=var1+"/ic/api/integration/v1/integrations/archive"
-				// echo "after: ${var1}"
-				// def IntegrationFileName='NEWINTEGRATION_NEWREPO_01.00.0000.iar'
-				// def authorizationBasic = 'Basic cG9jdXNlcjpIVk9JQ01heSMyMDIz'
-				def curlCommand = "curl --location \"${IntegrationArchiveURL}\" --header \"Authorization: ${authorizationBasic}\" --form \"file=@\\\"${IntegrationFileName}\\\"\""
+				def URL=(params.IntegrationArchiveURL).toString()+"/ic/api/integration/v1/integrations/archive"
+				def curlCommand = "curl --location \"${URL}\" --silent --header \"Authorization: ${params.AuthorizationBasic1}\" --form \"file=@\\\"${params.IntegrationFileName}\\\"\""
                 bat(curlCommand)
 				}
 			}
@@ -21,11 +16,11 @@ pipeline
         stage('Configuring a connection') {
             steps {
 			script{
-                bat'''
-                curl --header "Authorization: Basic ZGV2b3BzX3VzZXI6T2ljX0plbmtpbnMjMjAyMw==" --header "X-HTTP-Method-Override:PATCH" --header "Content-Type:application/json" -d @NewRepoConProp.json https://testinstance-idevjxz332qf-ia.integration.ocp.oraclecloud.com/ic/api/integration/v1/connections/NEWREPOCON
-                '''
+				 bat """
+                    curl --header "Authorization: ${params.AuthorizationBasic2}" --header "X-HTTP-Method-Override:PATCH" --header "Content-Type:application/json" -d @${params.RESTConnFileName} ${IntegrationArchiveURL}/ic/api/integration/v1/connections/${params.connectionName}
+                    """
 				}
-            }
+			}
         }
 		
 		stage('Configuring a new lookup')
@@ -33,7 +28,10 @@ pipeline
 		steps { 
 		script{
 				bat'''
-				curl -X POST --header "Authorization: Basic ZGV2b3BzX3VzZXI6T2ljX0plbmtpbnMjMjAyMw==" --form file=@PersonDetails.csv --form type=application/octet-stream https://testinstance-idevjxz332qf-ia.integration.ocp.oraclecloud.com/ic/api/integration/v1/lookups/archive
+				echo "${LookupFileName}"
+				curl -X POST --header "Authorization: ${params.AuthorizationBasic2}" --form \"file=@\\\"${LookupFileName}\\\"\" --form type=application/octet-stream ${IntegrationArchiveURL}/ic/api/integration/v1/lookups/archive
+				//curl -X POST --header "Authorization: Basic ZGV2b3BzX3VzZXI6T2ljX0plbmtpbnMjMjAyMw==" --form file=@PersonDetails.csv --form type=application/octet-stream https://testinstance-idevjxz332qf-ia.integration.ocp.oraclecloud.com/ic/api/integration/v1/lookups/archive
+
 				'''
 				}
 			}
