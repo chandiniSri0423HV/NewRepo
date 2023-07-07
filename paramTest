@@ -1,25 +1,54 @@
-pipeline {
-    agent any
-    parameters {
-        string(name: "FileName", defaultValue: "Deactivate.json", description: "FileName")
-		string(name: "IntegrationName", defaultValue: "NEWINTEGRATION_NEWREPO_01.00.0000", description: "IntegrationName")
-        string(name: "BasicAuthentication", defaultValue: "Basic ZGV2b3BzX3VzZXI6T2ljX0plbmtpbnMjMjAyMw==", description: "BasicAuthentication")
-		string(name: "API_URL", defaultValue: "https://testinstance-idevjxz332qf-ia.integration.ocp.oraclecloud.com/ic/api/integration/v1/integrations/", description: "API_URL")
+pipeline
+{
+	agent any
+	stages {
+		stage('Deployement of an Integration'){
+			steps{
+				script{
+				// def var1 = 'https://testinstance-idevjxz332qf-ia.integration.ocp.oraclecloud.com'
+				// echo "before : ${var1}"
+				// var1=var1+"/ic/api/integration/v1/integrations/archive"
+				// echo "after: ${var1}"
+				// def IntegrationFileName='NEWINTEGRATION_NEWREPO_01.00.0000.iar'
+				// def authorizationBasic = 'Basic cG9jdXNlcjpIVk9JQ01heSMyMDIz'
+				def curlCommand = "curl --location \"${IntegrationArchiveURL}\" --header \"Authorization: ${authorizationBasic}\" --form \"file=@\\\"${IntegrationFileName}\\\"\""
+                bat(curlCommand)
+				}
+			}
+		}
+		
 
-    }
-    stages {
-        stage("Integration Deployment") {
+        stage('Configuring a connection') {
             steps {
-                echo "$params.FileName"
-				echo "$params.BasicAuthentication"
-				bat'''
-				curl --location "https://testinstance-idevjxz332qf-ia.integration.ocp.oraclecloud.com/ic/api/integration/v1/integrations/archive" --header "Authorization: Basic cG9jdXNlcjpIVk9JQ01heSMyMDIz" --form "file=@"NEWINTEGRATION_NEWREPO_01.00.0000.iar"
-				'''
-				bat'''
-				curl -X POST --header "Authorization: ${params.BasicAuthentication}" --header "Content-Type:application/json" --header "X-HTTP-Method-Override:PATCH" -d @${params.FileName} -d 'enableAsyncActivationMode=true' "${params.API_URL}${params.IntegrationName}"
-				'''
+			script{
+                bat'''
+                curl --header "Authorization: Basic ZGV2b3BzX3VzZXI6T2ljX0plbmtpbnMjMjAyMw==" --header "X-HTTP-Method-Override:PATCH" --header "Content-Type:application/json" -d @NewRepoConProp.json https://testinstance-idevjxz332qf-ia.integration.ocp.oraclecloud.com/ic/api/integration/v1/connections/NEWREPOCON
+                '''
+				}
             }
         }
-        
+		
+		stage('Configuring a new lookup')
+		{
+		steps { 
+		script{
+				bat'''
+				curl -X POST --header "Authorization: Basic ZGV2b3BzX3VzZXI6T2ljX0plbmtpbnMjMjAyMw==" --form file=@PersonDetails.csv --form type=application/octet-stream https://testinstance-idevjxz332qf-ia.integration.ocp.oraclecloud.com/ic/api/integration/v1/lookups/archive
+				'''
+				}
+			}
+		}
+		
+		
+		stage('Activation of the integration')
+		{
+		steps { 
+		script{
+				bat'''		
+				curl --header "Authorization: Basic ZGV2b3BzX3VzZXI6T2ljX0plbmtpbnMjMjAyMw==" --header "Content-Type:application/json" --header "X-HTTP-Method-Override:PATCH" -d @Activate.json --location "https://testinstance-idevjxz332qf-ia.integration.ocp.oraclecloud.com/ic/api/integration/v1/integrations/NEWINTEGRATION_NEWREPO|01.00.0000"
+				'''
+				}
+			}
+		}
     }
 }
