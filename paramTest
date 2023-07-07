@@ -1,6 +1,6 @@
 pipeline{
 	agent any
-	
+	node(){
 	properties([
 		parameters([
 			string(name:'IntegrationFileName', 
@@ -18,4 +18,5 @@ pipeline{
 		}
 		}
 	}
+}
 }
