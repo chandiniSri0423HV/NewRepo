@@ -1,9 +1,10 @@
 pipeline {
     agent any
     parameters {
-        string(name: "IntegrationFileName", defaultValue: "NEWINTEGRATION_NEWREPO_01.00.0000", description: "IntegrationFileName")
-        string(name: "BasicAuthentication", defaultValue: "Basic cG9jdXNlcjpIVk9JQ01heSMyMDIz", description: "BasicAuthentication")
-		string(name: "IntegrationArchiveURL", defaultValue: "https://testinstance-idevjxz332qf-ia.integration.ocp.oraclecloud.com/ic/api/integration/v1/integrations/archive", description: "IntegrationArchiveURL")
+        string(name: "FileName", defaultValue: "Deactivate.json", description: "FileName")
+		string(name: "IntegrationName", defaultValue: "NEWINTEGRATION_NEWREPO_01.00.0000", description: "IntegrationName")
+        string(name: "BasicAuthentication", defaultValue: "Basic ZGV2b3BzX3VzZXI6T2ljX0plbmtpbnMjMjAyMw==", description: "BasicAuthentication")
+		string(name: "API_URL", defaultValue: "https://testinstance-idevjxz332qf-ia.integration.ocp.oraclecloud.com/ic/api/integration/v1/integrations/", description: "API_URL")
 
     }
     stages {
@@ -16,7 +17,7 @@ pipeline {
 				curl --location "https://testinstance-idevjxz332qf-ia.integration.ocp.oraclecloud.com/ic/api/integration/v1/integrations/archive" --header "Authorization: Basic cG9jdXNlcjpIVk9JQ01heSMyMDIz" --form "file=@"NEWINTEGRATION_NEWREPO_01.00.0000.iar"
 				'''
 				bat'''
-				curl --location "${params.IntegrationArchiveURL}" --header "Authorization: ${params.BasicAuthentication}" --form "file=@"${params.IntegrationFileName}"
+				curl -X POST --header "Authorization: ${params.BasicAuthentication}" --header "Content-Type:application/json" --header "X-HTTP-Method-Override:PATCH" -d @${params.FileName} -d 'enableAsyncActivationMode=true' "${params.API_URL}${params.IntegrationName}"
 				'''
             }
         }
