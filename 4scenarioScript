@@ -4,7 +4,7 @@ pipeline{
 		stage('Deactivate NEWINTEGRATION_NEWREPO_01.00.0001') {
             steps {
 				bat '''
-				curl -X POST --header "Authorization: Basic ZGV2b3BzX3VzZXI6T2ljX0plbmtpbnMjMjAyMw==" --header "Content-Type:application/json" --header "X-HTTP-Method-Override:PATCH" -d @C:/Docs/Git/NewRepo/Deactivate.json -d "enableAsyncActivationMode=true" "https://testinstance-idevjxz332qf-ia.integration.ocp.oraclecloud.com/ic/api/integration/v1/integrations/NEWINTEGRATION_NEWREPO|01.00.0001"
+				curl -X POST --header "Authorization: Basic ZGV2b3BzX3VzZXI6T2ljX0plbmtpbnMjMjAyMw==" --header "Content-Type:application/json" --header "X-HTTP-Method-Override:PATCH" -d @Deactivate.json -d "enableAsyncActivationMode=true" "https://testinstance-idevjxz332qf-ia.integration.ocp.oraclecloud.com/ic/api/integration/v1/integrations/NEWINTEGRATION_NEWREPO|01.00.0001"
 				'''
 				echo "NEWINTEGRATION_NEWREPO_01.00.0001 integration deactivated"
             }
@@ -22,7 +22,7 @@ pipeline{
 		stage('Activate NEWINTEGRATION_NEWREPO_01.00.0001') {
             steps {
 				bat'''
-				curl --header "Authorization: Basic ZGV2b3BzX3VzZXI6T2ljX0plbmtpbnMjMjAyMw==" --header "Content-Type:application/json" --header "X-HTTP-Method-Override:PATCH" -d @C:/Docs/Git/NewRepo/Activate.json --location "https://testinstance-idevjxz332qf-ia.integration.ocp.oraclecloud.com/ic/api/integration/v1/integrations/NEWINTEGRATION_NEWREPO|01.00.0001"
+				curl --header "Authorization: Basic ZGV2b3BzX3VzZXI6T2ljX0plbmtpbnMjMjAyMw==" --header "Content-Type:application/json" --header "X-HTTP-Method-Override:PATCH" -d @Activate.json --location "https://testinstance-idevjxz332qf-ia.integration.ocp.oraclecloud.com/ic/api/integration/v1/integrations/NEWINTEGRATION_NEWREPO|01.00.0001"
 				'''
 				echo "NEWINTEGRATION_NEWREPO_01.00.0001 integration activated"
             }

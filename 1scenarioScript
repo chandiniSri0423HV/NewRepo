@@ -38,7 +38,7 @@ pipeline
 		{
 		steps { 
 				bat'''
-				curl -X POST --header "Authorization: Basic ZGV2b3BzX3VzZXI6T2ljX0plbmtpbnMjMjAyMw==" --form file=@C:/Docs/Git/NewRepo/PersonDetails.csv --form type=application/octet-stream https://testinstance-idevjxz332qf-ia.integration.ocp.oraclecloud.com/ic/api/integration/v1/lookups/archive
+				curl -X POST --header "Authorization: Basic ZGV2b3BzX3VzZXI6T2ljX0plbmtpbnMjMjAyMw==" --form file=@PersonDetails.csv --form type=application/octet-stream https://testinstance-idevjxz332qf-ia.integration.ocp.oraclecloud.com/ic/api/integration/v1/lookups/archive
 				'''
 			}
 		}
@@ -48,7 +48,7 @@ pipeline
 		{
 		steps { 
 				bat'''		
-				curl --header "Authorization: Basic ZGV2b3BzX3VzZXI6T2ljX0plbmtpbnMjMjAyMw==" --header "Content-Type:application/json" --header "X-HTTP-Method-Override:PATCH" -d @C:/Docs/Git/NewRepo/Activate.json --location "https://testinstance-idevjxz332qf-ia.integration.ocp.oraclecloud.com/ic/api/integration/v1/integrations/NEWINTEGRATION_NEWREPO|01.00.0000"
+				curl --header "Authorization: Basic ZGV2b3BzX3VzZXI6T2ljX0plbmtpbnMjMjAyMw==" --header "Content-Type:application/json" --header "X-HTTP-Method-Override:PATCH" -d @Activate.json --location "https://testinstance-idevjxz332qf-ia.integration.ocp.oraclecloud.com/ic/api/integration/v1/integrations/NEWINTEGRATION_NEWREPO|01.00.0000"
 				'''
 			}
 		}
