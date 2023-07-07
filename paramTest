@@ -7,7 +7,7 @@ pipeline{
 					descriptiton:'Integration File Name',
 					defaultValue:'')
 		])
-		echo "${IntegrationFileName}
+		echo "${IntegrationFileName}"
 		
 		bat'''
 		'''
