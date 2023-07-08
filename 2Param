@@ -1,0 +1,53 @@
+pipeline{
+	agent any
+	stages{
+		stage('Deactivation of integration'){
+            steps {
+				script{
+					def integName = (params.IntegrationName).toString()  
+					def integURL =(params.IntegrationArchiveURL).toString()
+					def deactivateIntegrationCmd = "curl --header \"Authorization: ${params.AuthorizationBasic2}\" --header \"Content-Type: application/json\" --header \"X-HTTP-Method-Override: PATCH\" -d @${params.DetivationJsonFile} -d 'enableAsyncActivationMode=true' \"${integURL}/ic/api/integration/v1/integrations/${integName}\""
+					bat(deactivateIntegrationCmd)
+				}
+            }
+        }
+		
+		stage('Updating of IAR Files to OIC'){
+            steps {
+				script {
+					def updateIntegFileCmd = "curl -X PUT --header \"Authorization: ${params.AuthorizationBasic1}\" --header \"Accept:application/json\" --form \"file=@\\\"${integrationFileName}\\\"\" --form type=application/octet-stream ${IntegrationArchiveURL}/ic/api/integration/v1/integrations/archive"
+					bat(updateIntegFileCmd)
+				}
+			}
+        }
+		
+		stage('Configuring a connection'){
+            steps {
+				script{
+					bat"""
+					curl --header \"Authorization: ${params.AuthorizationBasic2}\" --header "X-HTTP-Method-Override:PATCH" --header "Content-Type:application/json" -d @${params.RESTConnFileName} ${IntegrationArchiveURL}/ic/api/integration/v1/connections/${params.connectionName}
+					"""
+				}
+			}
+        }
+		
+		stage('Update an old lookup'){
+			steps { 
+				script{
+					def updateLookupCmd = "curl -X PUT --header \"Authorization: ${params.AuthorizationBasic2}\" -F file=@${params.LookupFileName} -F type=application/octet-stream \"${IntegrationArchiveURL}/ic/api/integration/v1/lookups/archive\""
+					bat(updateLookupCmd)
+				}
+			}
+		}
+		
+		stage('Activation of the integration'){
+			steps { 
+				script{
+					def integName = (params.IntegrationName).toString()
+					def activateIntegrationCmd = "curl --header \"Authorization: ${params.AuthorizationBasic2}\" --header \"Content-Type: application/json\" --header \"X-HTTP-Method-Override: PATCH\" -d @${params.ActivationJsonFile} --location \"${IntegrationArchiveURL}/ic/api/integration/v1/integrations/${integName}\""
+					bat(activateIntegrationCmd)
+				}
+			}
+		}
+	}
+}

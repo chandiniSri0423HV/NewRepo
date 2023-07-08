@@ -1,0 +1,34 @@
+pipeline{
+	agent any
+	stages{
+		stage('Deactivate New Version Integration'){
+            steps {
+                script{
+				def NewintegName = (params.NewIntegrationName).toString()
+				def integURL =(params.IntegrationArchiveURL).toString()
+				def deactivateIntegrationCmd = "curl --header \"Authorization: ${params.AuthorizationBasic2}\" --header \"Content-Type: application/json\" --header \"X-HTTP-Method-Override: PATCH\" -d @${params.DetivationJsonFile} -d 'enableAsyncActivationMode=true' \"${integURL}/ic/api/integration/v1/integrations/${NewintegName}\""
+				bat(deactivateIntegrationCmd)
+				}
+            }
+        }
+        
+		stage('Importing and Replacing the Existed New integration'){
+            steps {
+				script{
+					def importReplaceCmd = "curl -X PUT --header \"Authorization: ${params.AuthorizationBasic1}\" --header \"Accept:application/json\" --form \"file=@\\\"${integrationFileName}\\\"\" --form type=application/octet-stream ${IntegrationArchiveURL}/ic/api/integration/v1/integrations/archive"
+					bat(importReplaceCmd)
+				}
+            }
+        }
+		
+		stage('Activate Replaced Integration'){
+			steps { 
+				script{
+					def NewintegName = (params.NewIntegrationName).toString()
+					def activateIntegrationCmd = "curl --header \"Authorization: ${params.AuthorizationBasic2}\" --header \"Content-Type: application/json\" --header \"X-HTTP-Method-Override: PATCH\" -d @${params.ActivationJsonFile} --location \"${IntegrationArchiveURL}/ic/api/integration/v1/integrations/${NewintegName}\""
+					bat(activateIntegrationCmd)
+				}
+			}
+		}
+    }
+}

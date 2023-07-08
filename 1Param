@@ -1,0 +1,46 @@
+pipeline
+{
+	agent any
+	stages {
+		stage('Deployement of an Integration'){
+			steps{
+				script{
+					def integURL=(params.IntegrationArchiveURL).toString()+"/ic/api/integration/v1/integrations/archive"
+					def deployIntegCmd = "curl --location \"${integURL}\" --silent --header \"Authorization: ${params.authorizationBasic}\" --form \"file=@\\\"${params.IntegrationFileName}\\\"\""
+					bat(deployIntegCmd)
+				}
+			}
+		}
+		
+
+        stage('Configuring a connection'){
+            steps {
+				script{
+					bat """
+                    curl --header "Authorization: ${params.AuthorizationBasic2}" --header "X-HTTP-Method-Override:PATCH" --header "Content-Type:application/json" -d @${params.RESTConnFileName} ${IntegrationArchiveURL}/ic/api/integration/v1/connections/${params.connectionName}
+                    """
+				}
+			}
+        }
+		
+		stage('Configuring a new lookup'){
+			steps { 
+				script{
+					def configLookupCmd = "curl -X POST --header \"Authorization: ${params.AuthorizationBasic2}\" -F \"file=@${params.LookupFileName}\" -F \"type=application/octet-stream\" ${IntegrationArchiveURL}/ic/api/integration/v1/lookups/archive"
+					bat(configLookupCmd)
+				}
+			}
+		}
+		
+		
+		stage('Activation of the integration'){
+			steps { 
+				script{
+					def integName = (params.IntegrationName).toString() //Converting the integration name which is concatenated with numbers into a string 
+					def activateIntegrationCmd = "curl --header \"Authorization: ${params.AuthorizationBasic2}\" --header \"Content-Type: application/json\" --header \"X-HTTP-Method-Override: PATCH\" -d @${params.ActivationJsonFile} --location \"${IntegrationArchiveURL}/ic/api/integration/v1/integrations/${integName}\""
+					bat(activateIntegrationCmd)
+				}
+			}
+		}
+    }
+}

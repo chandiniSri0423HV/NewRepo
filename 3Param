@@ -1,0 +1,35 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Deactivate Previous Version Integration'){
+            steps {
+                script{
+					def integName = (params.IntegrationName).toString()  
+					def integURL =(params.IntegrationArchiveURL).toString()
+					def deactivateIntegrationCmd = "curl --header \"Authorization: ${params.AuthorizationBasic2}\" --header \"Content-Type: application/json\" --header \"X-HTTP-Method-Override: PATCH\" -d @${params.DetivationJsonFile} -d 'enableAsyncActivationMode=true' \"${integURL}/ic/api/integration/v1/integrations/${integName}\""
+					bat(deactivateIntegrationCmd)
+				}
+            }
+        }
+
+        stage('Import New Version Integration'){
+            steps {
+				script{
+					def NewIntegrationCmd = "curl --location \"${IntegrationArchiveURL}/ic/api/integration/v1/lookups/archive\" --header \"Authorization: ${params.AuthorizationBasic1}\" --form \"file=@\\\"${integrationFileName}\\\"\""
+					bat(NewIntegrationCmd)
+				}
+            }
+        }
+
+		stage('Activation of the integration'){
+			steps { 
+				script{
+					def NewintegName = (params.NewIntegrationName).toString()
+					def activateIntegrationCmd = "curl --header \"Authorization: ${params.AuthorizationBasic2}\" --header \"Content-Type: application/json\" --header \"X-HTTP-Method-Override: PATCH\" -d @${params.ActivationJsonFile} --location \"${IntegrationArchiveURL}/ic/api/integration/v1/integrations/${NewintegName}\""
+					bat(activateIntegrationCmd)
+				}
+			}
+		}
+    }
+}
