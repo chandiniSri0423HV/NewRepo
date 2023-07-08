@@ -1,0 +1,12 @@
+pipeline
+{
+	agent any
+	stages {
+        stage('Generate Token') {
+            steps {
+                def curlCommand = "curl -s \"${params.tokenURL}\" --header \"Authorization: ${params.authorizationHeader}\" --header \"Content-Type: application/x-www-form-urlencoded\" --data-urlencode \"grant_type=${params.grantType}\" --data-urlencode \"scope=${params.scope}\" --data-urlencode \"client_id=${params.clientId}\" --data-urlencode \"client_secret=${params.clientSecret}\" --insecure -o ${params.tokenOutputFile}"
+                bat(curlCommand)
+            }
+        }
+	}
+}
