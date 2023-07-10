@@ -5,9 +5,9 @@ pipeline {
         stage('Deactivate Previous Version Integration'){
             steps {
                 script{
-					def integName = (params.IntegrationName).toString()  
-					def integURL =(params.IntegrationArchiveURL).toString()
-					def deactivateIntegrationCmd = "curl --header \"Authorization: ${params.AuthorizationBasic2}\" --header \"Content-Type: application/json\" --header \"X-HTTP-Method-Override: PATCH\" -d @${params.DetivationJsonFile} -d 'enableAsyncActivationMode=true' \"${integURL}/ic/api/integration/v1/integrations/${integName}\""
+					def integName = (params.Integration_Identifier).toString()  
+					def integURL =(params.InstanceURL).toString()
+					def deactivateIntegrationCmd = "curl --header --user ${params.Username}:${params.Password} --header \"Content-Type: application/json\" --header \"X-HTTP-Method-Override: PATCH\" -d @${params.DetivationJsonFile} -d 'enableAsyncActivationMode=true' \"${integURL}/ic/api/integration/v1/integrations/${integName}\""
 					bat(deactivateIntegrationCmd)
 				}
             }
@@ -16,7 +16,7 @@ pipeline {
         stage('Import New Version Integration'){
             steps {
 				script{
-					def NewIntegrationCmd = "curl --location \"${IntegrationArchiveURL}/ic/api/integration/v1/lookups/archive\" --header \"Authorization: ${params.AuthorizationBasic1}\" --form \"file=@\\\"${integrationFileName}\\\"\""
+					def NewIntegrationCmd = "curl --location \"${params.InstanceURL}/ic/api/integration/v1/lookups/archive\" --user ${params.Username}:${params.Password} --form \"file=@\\\"${params.IARFileName}\\\"\""
 					bat(NewIntegrationCmd)
 				}
             }
@@ -25,8 +25,8 @@ pipeline {
 		stage('Activation of the integration'){
 			steps { 
 				script{
-					def NewintegName = (params.NewIntegrationName).toString()
-					def activateIntegrationCmd = "curl --header \"Authorization: ${params.AuthorizationBasic2}\" --header \"Content-Type: application/json\" --header \"X-HTTP-Method-Override: PATCH\" -d @${params.ActivationJsonFile} --location \"${IntegrationArchiveURL}/ic/api/integration/v1/integrations/${NewintegName}\""
+					def NewintegName = (params.Integration_Identifier).toString()
+					def activateIntegrationCmd = "curl --user ${params.Username}:${params.Password} --header \"Content-Type: application/json\" --header \"X-HTTP-Method-Override: PATCH\" -d @${params.ActivationJsonFile} --location \"${params.InstanceURL}/ic/api/integration/v1/integrations/${NewintegName}\""
 					bat(activateIntegrationCmd)
 				}
 			}

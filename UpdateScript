@@ -23,7 +23,7 @@ pipeline{
 			}
         }
 		
-		stage('Configuring a connection'){
+		stage('Configuring an old connection'){
             steps {
 				script{
 					bat"""

@@ -4,9 +4,9 @@ pipeline{
 		stage('Deactivate New Version Integration'){
             steps {
                 script{
-				def NewintegName = (params.NewIntegrationName).toString()
-				def integURL =(params.IntegrationArchiveURL).toString()
-				def deactivateIntegrationCmd = "curl --header \"Authorization: ${params.AuthorizationBasic2}\" --header \"Content-Type: application/json\" --header \"X-HTTP-Method-Override: PATCH\" -d @${params.DetivationJsonFile} -d 'enableAsyncActivationMode=true' \"${integURL}/ic/api/integration/v1/integrations/${NewintegName}\""
+				def NewintegName = (params.Integration_Identifier).toString()
+				def integURL =(params.InstanceURL).toString()
+				def deactivateIntegrationCmd = "curl --user ${params.Username}:${params.Password} --header \"Content-Type: application/json\" --header \"X-HTTP-Method-Override: PATCH\" -d @${params.DetivationJsonFile} -d 'enableAsyncActivationMode=true' \"${integURL}/ic/api/integration/v1/integrations/${NewintegName}\""
 				bat(deactivateIntegrationCmd)
 				}
             }
@@ -15,7 +15,7 @@ pipeline{
 		stage('Importing and Replacing the Existed New integration'){
             steps {
 				script{
-					def importReplaceCmd = "curl -X PUT --header \"Authorization: ${params.AuthorizationBasic1}\" --header \"Accept:application/json\" --form \"file=@\\\"${integrationFileName}\\\"\" --form type=application/octet-stream ${IntegrationArchiveURL}/ic/api/integration/v1/integrations/archive"
+					def importReplaceCmd = "curl -X PUT --user ${params.Username}:${params.Password} --header \"Accept:application/json\" --form \"file=@\\\"${params.IARFileName}\\\"\" --form type=application/octet-stream ${params.InstanceURL}/ic/api/integration/v1/integrations/archive"
 					bat(importReplaceCmd)
 				}
             }
@@ -24,8 +24,8 @@ pipeline{
 		stage('Activate Replaced Integration'){
 			steps { 
 				script{
-					def NewintegName = (params.NewIntegrationName).toString()
-					def activateIntegrationCmd = "curl --header \"Authorization: ${params.AuthorizationBasic2}\" --header \"Content-Type: application/json\" --header \"X-HTTP-Method-Override: PATCH\" -d @${params.ActivationJsonFile} --location \"${IntegrationArchiveURL}/ic/api/integration/v1/integrations/${NewintegName}\""
+					def NewintegName = (params.Integration_Identifier).toString()
+					def activateIntegrationCmd = "curl --user ${params.Username}:${params.Password} --header \"Content-Type: application/json\" --header \"X-HTTP-Method-Override: PATCH\" -d @${params.ActivationJsonFile} --location \"${params.InstanceURL}/ic/api/integration/v1/integrations/${NewintegName}\""
 					bat(activateIntegrationCmd)
 				}
 			}
