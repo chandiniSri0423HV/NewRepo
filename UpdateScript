@@ -1,19 +1,6 @@
 pipeline{
 	agent any
 	stages{
-		stage('Deactivation of integration'){
-            steps {
-				script {
-					def integName = params.Integration_Identifier.toString()
-					def integURL = params.InstanceURL.toString()
-					//def deActivationStatus = '{"status":"CONFIGURED"}'
-					def deactivateIntegrationCmd = "curl --user ${params.Username}:${params.Password} --header \"Content-Type: application/json\" --header \"X-HTTP-Method-Override: PATCH\" -d @${params.DetivationJsonFile} -d 'enableAsyncActivationMode=true' \"${integURL}/ic/api/integration/v1/integrations/${integName}\""
-					bat(deactivateIntegrationCmd)
-				}
-
-            }
-        }
-		
 		stage('Updating of IAR Files to OIC'){
             steps {
 				script {
@@ -35,23 +22,23 @@ pipeline{
 		
 			
 		stage('Update an old lookup') {
-    steps {
-        script {
-            def updateLookupCmd = "curl -X PUT --user ${params.Username}:${params.Password} -F \"file=@${params.LookupFileName}\" -F type=application/octet-stream \"${params.InstanceURL}/ic/api/integration/v1/lookups/archive\""
-            bat(updateLookupCmd)
-        }
-    }
-}
+			steps {
+				script {
+					def updateLookupCmd = "curl -X PUT --user ${params.Username}:${params.Password} -F \"file=@${params.LookupFileName}\" -F type=application/octet-stream \"${params.InstanceURL}/ic/api/integration/v1/lookups/archive\""
+					bat(updateLookupCmd)
+				}
+			}
+		}
 
-stage('Activation of the integration') {
-    steps {
-        script {
-            def integName = params.Integration_Identifier.toString()
-            //def activationStatus = '{"status":"ACTIVATED"}'
-            def activateIntegrationCmd = "curl --user ${params.Username}:${params.Password} --header \"Content-Type: application/json\" --header \"X-HTTP-Method-Override: PATCH\" -d @${params.ActivationJsonFile} --location \"${params.InstanceURL}/ic/api/integration/v1/integrations/${integName}\""
-            bat(activateIntegrationCmd)
-        }
-    }
-}
+		stage('Activation of the integration') {
+			steps {
+				script {
+					def integName = params.Integration_Identifier.toString()
+					//def activationStatus = '{"status":"ACTIVATED"}'
+					def activateIntegrationCmd = "curl --user ${params.Username}:${params.Password} --header \"Content-Type: application/json\" --header \"X-HTTP-Method-Override: PATCH\" -d @${params.ActivationJsonFile} --location \"${params.InstanceURL}/ic/api/integration/v1/integrations/${integName}\""
+					bat(activateIntegrationCmd)
+				}
+			}
+		}
 	}
 }
