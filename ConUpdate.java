@@ -1,6 +1,7 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import org.json.simple.JSONObject;
@@ -101,17 +102,37 @@ public class ConUpdate {
                 jsonPayload.toString(),
                 endpoint
         );
+        System.out.println("Curl Command: " + curlCommand);
 
         // Execute the curl command
-        try {
-            ProcessBuilder processBuilder = new ProcessBuilder(curlCommand.split(" "));
-            Process process = processBuilder.start();
-            int exitCode = process.waitFor();
-            if (exitCode == 0) {
-                System.out.println("CURL command executed successfully.");
-            } else {
-                System.out.println("CURL command execution failed with exit code: " + exitCode);
-            }
+         try {
+        ProcessBuilder processBuilder = new ProcessBuilder(curlCommand.split(" "));
+        Process process = processBuilder.start();
+        
+        // Capture the response output
+        StringBuilder responseOutput = new StringBuilder();
+        BufferedReader responseReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+        String responseLine;
+        while ((responseLine = responseReader.readLine()) != null) {
+            responseOutput.append(responseLine).append("\n");
+        }
+        
+        // Capture the error output
+        StringBuilder errorOutput = new StringBuilder();
+        BufferedReader errorReader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+        String errorLine;
+        while ((errorLine = errorReader.readLine()) != null) {
+            errorOutput.append(errorLine).append("\n");
+        }
+
+        int exitCode = process.waitFor();
+        if (exitCode == 0) {
+            System.out.println("CURL command executed successfully.");
+            System.out.println("Response Output:\n" + responseOutput.toString());
+        } else {
+            System.out.println("CURL command execution failed with exit code: " + exitCode);
+            System.out.println("Error Output:\n" + errorOutput.toString());
+        }
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
