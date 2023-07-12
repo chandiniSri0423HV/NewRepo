@@ -7,7 +7,7 @@ pipeline{
 					def integName = params.Integration_Identifier.toString()
 					def integURL = params.InstanceURL.toString()
 					//def deActivationStatus = '{"status":"CONFIGURED"}'
-					def deactivateIntegrationCmd = "curl --user ${params.Username}:${params.Password} --header \"Content-Type: application/json\" --header \"X-HTTP-Method-Override: PATCH\" -d @${params.DetivationJsonFile} -d 'enableAsyncActivationMode=true' \"${integURL}/ic/api/integration/v1/integrations/${integName}\""
+					def deactivateIntegrationCmd = "curl --user ${params.Username}:${params.Password} --header \"Content-Type: application/json\" --header \"X-HTTP-Method-Override: PATCH\" -d @${params.DeactivationJsonFile} -d 'enableAsyncActivationMode=true' \"${integURL}/ic/api/integration/v1/integrations/${integName}\""
 					bat(deactivateIntegrationCmd)
 				}
 

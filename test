@@ -1,0 +1,17 @@
+pipeline
+{
+	agent any
+	
+		
+
+        stage('Configuring a connection'){
+            steps {
+				script{
+					bat " java curlCommand "C:/Docs/Git/NewRepo""
+				}
+            }
+        }
+		
+		
+    }
+}

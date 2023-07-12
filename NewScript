@@ -1,6 +1,9 @@
 pipeline
 {
 	agent any
+	parameters {
+        booleanParam(name: 'ActivateIntegration', defaultValue: false)
+    }
 	stages {
 		stage('Deployement of a new Integration'){
 			steps{
@@ -35,10 +38,23 @@ pipeline
 		
 		stage('Activation of the integration'){
 			steps { 
-				script{
-					def integName = (params.Integration_Identifier).toString() //Converting the integration name which is concatenated with numbers into a string 
-					def activateIntegrationCmd = "curl --user ${params.Username}:${params.Password} --header \"Content-Type: application/json\" --header \"X-HTTP-Method-Override: PATCH\" -d @${params.ActivationJsonFile} --location \"${params.InstanceURL}/ic/api/integration/v1/integrations/${integName}\""
-					bat(activateIntegrationCmd)
+				script {
+					def integName = params.Integration_Identifier.toString()
+					
+					if (params.ActivateIntegration) {
+                        // Perform action when the checkbox is checked
+                        echo 'Checkbox is checked'
+						def activateIntegrationCmd = "curl --user ${params.Username}:${params.Password} --header \"Content-Type: application/json\" --header \"X-HTTP-Method-Override: PATCH\" -d @${params.ActivationJsonFile} --location \"${params.InstanceURL}/ic/api/integration/v1/integrations/${integName}\""
+                        bat(activateIntegrationCmd)
+                    } else {
+                        // Perform a different action when the checkbox is not checked
+                        echo 'Checkbox is not checked'
+                        // Add your desired logic here
+                        def integURL = params.InstanceURL.toString()
+						def deactivateIntegrationCmd = "curl --user ${params.Username}:${params.Password} --header \"Content-Type: application/json\" --header \"X-HTTP-Method-Override: PATCH\" -d @${params.DeactivationJsonFile} -d 'enableAsyncActivationMode=true' \"${integURL}/ic/api/integration/v1/integrations/${integName}\""
+                        bat(deactivateIntegrationCmd)
+                        echo "Integration Configured"
+                    }
 				}
 			}
 		}
