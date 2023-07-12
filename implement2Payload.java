@@ -3,8 +3,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Scanner;
-
 import org.json.simple.JSONObject;
 
 public class implement2Payload {
@@ -14,8 +12,7 @@ public class implement2Payload {
             return;
         }
 
-        String csvFileName = args[0];
-        String csvFilePath = csvFileName;
+        String csvFilePath = args[0];
 
         try (BufferedReader br = new BufferedReader(new FileReader(csvFilePath))) {
             String headerLine = br.readLine();
