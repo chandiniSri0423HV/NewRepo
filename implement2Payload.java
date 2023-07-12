@@ -1,6 +1,7 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 import org.json.simple.JSONArray;
@@ -8,11 +9,13 @@ import org.json.simple.JSONObject;
 
 public class implement2Payload {
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
+        if (args.length < 1) {
+            System.out.println("CSV file name is missing. Please provide the CSV file name as a command-line argument.");
+            return;
+        }
 
-        System.out.print("Enter the CSV file name: ");
-        String csvFileName = scanner.nextLine();
-        String csvFilePath = csvFileName; // Assuming the CSV file is in the same directory as the Java file
+        String csvFileName = args[0];
+        String csvFilePath = csvFileName;
 
         try (BufferedReader br = new BufferedReader(new FileReader(csvFilePath))) {
             String headerLine = br.readLine();
@@ -47,7 +50,6 @@ public class implement2Payload {
     private static JSONObject createJsonPayload(String[] header, String[] values) {
         JSONArray connectionProperties = new JSONArray();
         JSONArray securityProperties = new JSONArray();
-
         connectionProperties.add(createConnectionProperty(header, values));
         securityProperties.add(createSecurityProperty(header, values));
         securityProperties.add(createPasswordProperty(header, values));
