@@ -34,16 +34,20 @@ public class ConUpdate {
             while ((line = br.readLine()) != null) {
                 String[] values = line.split(",", -1); // Split the line and include empty values
 
-                JSONObject connectionProperty = createConnectionProperty(header, values);
-                connectionProperties.add(connectionProperty);
+               // Create the connection property
+JSONObject connectionProperty = createConnectionProperty();
+connectionProperties.add(connectionProperty);
 
-                JSONObject securityProperty = createSecurityProperty(header, values);
-                securityProperties.add(securityProperty);
+// Create the security properties
+JSONObject usernameProperty = createSecurityProperty("Username", "devops_user");
+securityProperties.add(usernameProperty);
 
-                JSONObject passwordProperty = createPasswordProperty(header, values);
-                securityProperties.add(passwordProperty);
+JSONObject passwordProperty = createSecurityProperty("Password", "Oic_Jenkins#2023");
+securityProperties.add(passwordProperty);
 
-                executeCurlCommand(connectionProperty, securityProperty, passwordProperty);
+// Execute the curl command
+executeCurlCommand(connectionProperty, securityProperties);
+
 
                 row++;
             }
@@ -52,7 +56,7 @@ public class ConUpdate {
         }
     }
 
-    private static JSONObject createConnectionProperty(String[] header, String[] values) {
+    private static JSONObject createConnectionProperty() {
         JSONObject connectionProperty = new JSONObject();
         connectionProperty.put("displayName", "Connection URL");
         connectionProperty.put("hasAttachment", false);
@@ -61,27 +65,27 @@ public class ConUpdate {
         connectionProperty.put("propertyName", "connectionUrl");
         connectionProperty.put("propertyShortDesc", "Please make sure that this value really corresponds to the type selected above.");
         connectionProperty.put("propertyType", "URL");
-        connectionProperty.put("propertyValue", getValueForHeader(header, values, "ConnectionURL"));
+        connectionProperty.put("propertyValue", "https://testinstance-idevjxz332qf-ia.integration.ocp.oraclecloud.com/");
         connectionProperty.put("requiredFlag", true);
-
+    
         return connectionProperty;
     }
-
-    private static JSONObject createSecurityProperty(String[] header, String[] values) {
+    
+    private static JSONObject createSecurityProperty(String propertyName, String propertyValue) {
         JSONObject securityProperty = new JSONObject();
-        securityProperty.put("displayName", "Username");
+        securityProperty.put("displayName", propertyName);
         securityProperty.put("hasAttachment", false);
         securityProperty.put("hiddenFlag", false);
-        securityProperty.put("propertyDescription", "A username credential");
+        securityProperty.put("propertyDescription", "A " + propertyName.toLowerCase() + " credential");
         securityProperty.put("propertyGroup", "CREDENTIALS");
-        securityProperty.put("propertyName", "username");
+        securityProperty.put("propertyName", propertyName.toLowerCase());
         securityProperty.put("propertyType", "STRING");
-        securityProperty.put("propertyValue", getValueForHeader(header, values, "Username"));
+        securityProperty.put("propertyValue", propertyValue);
         securityProperty.put("requiredFlag", true);
-
+    
         return securityProperty;
     }
-
+    
     private static JSONObject createPasswordProperty(String[] header, String[] values) {
         JSONObject passwordProperty = new JSONObject();
         passwordProperty.put("displayName", "Password");
@@ -106,22 +110,22 @@ public class ConUpdate {
         return "";
     }
 
-    private static void executeCurlCommand(JSONObject connectionProperty, JSONObject securityProperty, JSONObject passwordProperty) {
+    private static void executeCurlCommand(JSONObject connectionProperty, List<JSONObject> securityProperties) {
         String authorization = "ZGV2b3BzX3VzZXI6T2ljX0plbmtpbnMjMjAyMw==";
         String endpoint = "https://testinstance-idevjxz332qf-ia.integration.ocp.oraclecloud.com/ic/api/integration/v1/connections/NEWREPOCON";
-
+    
         JSONObject jsonPayload = new JSONObject();
         jsonPayload.put("connectionProperties", connectionProperty);
         jsonPayload.put("securityPolicy", "BASIC_AUTH");
-        jsonPayload.put("securityProperties", securityProperty);
-
+        jsonPayload.put("securityProperties", securityProperties);
+    
         String curlCommand = String.format(
-                "curl --header \"Authorization: Basic %s\" --header \"X-HTTP-Method-Override: PATCH\" --header \"Content-Type: application/json\" -d '%s' %s",
-                authorization,
-                jsonPayload.toString(),
-                endpoint
+            "curl --header \"Authorization: Basic %s\" --header \"X-HTTP-Method-Override: PATCH\" --header \"Content-Type: application/json\" -d '%s' %s",
+            authorization,
+            jsonPayload.toString(),
+            endpoint
         );
-
+    
         // Execute the curl command
         try {
             ProcessBuilder processBuilder = new ProcessBuilder(curlCommand.split(" "));
@@ -136,4 +140,5 @@ public class ConUpdate {
             e.printStackTrace();
         }
     }
+    
 }
