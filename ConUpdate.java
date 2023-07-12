@@ -120,10 +120,10 @@ executeCurlCommand(connectionProperty, securityProperties);
         jsonPayload.put("securityProperties", securityProperties);
     
         String curlCommand = String.format(
-            "curl --header \"Authorization: Basic %s\" --header \"X-HTTP-Method-Override: PATCH\" --header \"Content-Type: application/json\" -d '%s' %s",
+            "curl --location '%s' --header 'X-HTTP-Method-Override: PATCH' --header 'Content-Type: application/json' --header 'Authorization: Basic %s' --data '%s'",
+            endpoint,
             authorization,
-            jsonPayload.toString(),
-            endpoint
+            jsonPayload.toString()
         );
     
         // Execute the curl command
