@@ -9,10 +9,13 @@ import org.json.simple.JSONObject;
 
 public class implement2Payload {
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
+        Scanner sc=new Scanner(System.in);
+        if (args.length != 1) {
+            System.out.println("CSV file name is missing.");
+            return;
+        }
 
-        System.out.print("Enter the CSV file name: ");
-        String csvFileName = scanner.nextLine();
+        String csvFileName = args[0];
         String csvFilePath = csvFileName;
 
         try (BufferedReader br = new BufferedReader(new FileReader(csvFilePath))) {
@@ -41,7 +44,7 @@ public class implement2Payload {
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
-            scanner.close();
+            sc.close();
         }
     }
 
