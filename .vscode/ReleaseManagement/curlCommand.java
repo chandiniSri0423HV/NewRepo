@@ -1,13 +1,14 @@
+package ReleaseManagement;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Scanner;
 
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
-
-public class implement2Payload{
+public class curlCommand {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
@@ -33,6 +34,8 @@ public class implement2Payload{
                 System.out.println("Batch " + row);
                 System.out.println(jsonPayload.toString(4));
                 System.out.println();
+
+                executeCurlCommand(jsonPayload);
 
                 row++;
             }
@@ -101,8 +104,7 @@ public class implement2Payload{
         passwordProperty.put("propertyGroup", "CREDENTIALS");
         passwordProperty.put("propertyName", "password");
         passwordProperty.put("propertyType", "PASSWORD");
-        String tmp=getValueForHeader(header, values, "Password").toString();
-        passwordProperty.put("propertyValue", tmp);
+        passwordProperty.put("propertyValue", getValueForHeader(header, values, "Password"));
         passwordProperty.put("requiredFlag", true);
 
         return passwordProperty;
@@ -123,5 +125,30 @@ public class implement2Payload{
             }
         }
         return -1;
+    }
+
+    private static void executeCurlCommand(JSONObject jsonPayload) {
+        String authorization = "ZGV2b3BzX3VzZXI6T2ljX0plbmtpbnMjMjAyMw==";
+        String endpoint = "https://testinstance-idevjxz332qf-ia.integration.ocp.oraclecloud.com/ic/api/integration/v1/connections/NEWREPOCON";
+
+        String curlCommand = String.format(
+            "curl --header \"Authorization: Basic %s\" --header \"X-HTTP-Method-Override: PATCH\" --header \"Content-Type: application/json\" -d '%s' %s",
+            authorization,
+            jsonPayload.toString(),
+            endpoint
+        );
+
+        try {
+            ProcessBuilder processBuilder = new ProcessBuilder(curlCommand.split(" "));
+            Process process = processBuilder.start();
+            int exitCode = process.waitFor();
+            if (exitCode == 0) {
+                System.out.println("CURL command executed successfully.");
+            } else {
+                System.out.println("CURL command execution failed with exit code: " + exitCode);
+            }
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 }

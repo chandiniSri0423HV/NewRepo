@@ -1,11 +1,12 @@
+package ReleaseManagement;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Scanner;
 
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 public class implement2Payload{
     public static void main(String[] args) {
