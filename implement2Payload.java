@@ -6,8 +6,7 @@ import java.util.Scanner;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
-
-public class implement2Payload{
+public class implement2Payload {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
@@ -31,8 +30,10 @@ public class implement2Payload{
                 JSONObject jsonPayload = createJsonPayload(header, values);
 
                 System.out.println("Batch " + row);
-                System.out.println(jsonPayload.toString(4));
+                System.out.println(jsonPayload.toString());
                 System.out.println();
+
+                executeCurlCommand(jsonPayload);
 
                 row++;
             }
@@ -47,12 +48,9 @@ public class implement2Payload{
         JSONArray connectionProperties = new JSONArray();
         JSONArray securityProperties = new JSONArray();
 
-        JSONObject connectionProperty = createConnectionProperty(header, values);
-        connectionProperties.put(connectionProperty);
-        JSONObject securityProperty = createSecurityProperty(header, values);
-        securityProperties.put(securityProperty);
-        JSONObject passwordProperty = createPasswordProperty(header, values);
-        securityProperties.put(passwordProperty);
+        connectionProperties.add(createConnectionProperty(header, values));
+        securityProperties.add(createSecurityProperty(header, values));
+        securityProperties.add(createPasswordProperty(header, values));
 
         JSONObject jsonPayload = new JSONObject();
         jsonPayload.put("connectionProperties", connectionProperties);
@@ -101,8 +99,7 @@ public class implement2Payload{
         passwordProperty.put("propertyGroup", "CREDENTIALS");
         passwordProperty.put("propertyName", "password");
         passwordProperty.put("propertyType", "PASSWORD");
-        String tmp=getValueForHeader(header, values, "Password").toString();
-        passwordProperty.put("propertyValue", tmp);
+        passwordProperty.put("propertyValue", getValueForHeader(header, values, "Password"));
         passwordProperty.put("requiredFlag", true);
 
         return passwordProperty;
@@ -123,5 +120,30 @@ public class implement2Payload{
             }
         }
         return -1;
+    }
+
+    private static void executeCurlCommand(JSONObject jsonPayload) {
+        String authorization = "ZGV2b3BzX3VzZXI6T2ljX0plbmtpbnMjMjAyMw==";
+        String endpoint = "https://testinstance-idevjxz332qf-ia.integration.ocp.oraclecloud.com/ic/api/integration/v1/connections/NEWREPOCON";
+
+        String curlCommand = String.format(
+            "curl --header \"Authorization: Basic %s\" --header \"X-HTTP-Method-Override: PATCH\" --header \"Content-Type: application/json\" -d '%s' %s",
+            authorization,
+            jsonPayload.toString(),
+            endpoint
+        );
+
+        try {
+            ProcessBuilder processBuilder = new ProcessBuilder(curlCommand.split(" "));
+            Process process = processBuilder.start();
+            int exitCode = process.waitFor();
+            if (exitCode == 0) {
+                System.out.println("CURL command executed successfully.");
+            } else {
+                System.out.println("CURL command execution failed with exit code: " + exitCode);
+            }
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 }

@@ -1,22 +1,20 @@
-package ReleaseManagement;
+//package ReleaseManagement;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Scanner;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
-public class ReadfromCSV {
+public class implement2Payload {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
-        System.out.print("Enter the path to the CSV file: ");
-        String csvFilePath = scanner.nextLine();
-
-        JSONArray connectionProperties = new JSONArray();
-        JSONArray securityProperties = new JSONArray();
+        System.out.print("Enter the CSV file name: ");
+        String csvFileName = scanner.nextLine();
+        String csvFilePath = csvFileName; // Assuming the CSV file is in the same directory as the Java file
 
         try (BufferedReader br = new BufferedReader(new FileReader(csvFilePath))) {
             String headerLine = br.readLine();
@@ -28,22 +26,43 @@ public class ReadfromCSV {
             String[] header = headerLine.split(",");
 
             String line;
+            int row = 1;
             while ((line = br.readLine()) != null) {
                 String[] values = line.split(",", -1); // Split the line and include empty values
-                JSONObject connectionProperty = createConnectionProperty(header, values);
-                connectionProperties.put(connectionProperty);
-                JSONObject securityProperty = createSecurityProperty(header, values);
-                securityProperties.put(securityProperty);
+                JSONObject jsonPayload = createJsonPayload(header, values);
+
+                System.out.println("Batch " + row);
+                System.out.println(jsonPayload.toString());
+                System.out.println();
+
+                executeCurlCommand(jsonPayload);
+
+                row++;
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        JSONObject jsonPayload = createJsonPayload(connectionProperties, securityProperties);
-
-        System.out.println(jsonPayload.toString(4));
-
         scanner.close();
+    }
+
+    private static JSONObject createJsonPayload(String[] header, String[] values) {
+        JSONArray connectionProperties = new JSONArray();
+        JSONArray securityProperties = new JSONArray();
+
+        JSONObject connectionProperty = createConnectionProperty(header, values);
+        connectionProperties.put(connectionProperty);
+        JSONObject securityProperty = createSecurityProperty(header, values);
+        securityProperties.put(securityProperty);
+        JSONObject passwordProperty = createPasswordProperty(header, values);
+        securityProperties.put(passwordProperty);
+
+        JSONObject jsonPayload = new JSONObject();
+        jsonPayload.put("connectionProperties", connectionProperties);
+        jsonPayload.put("securityPolicy", "BASIC_AUTH");
+        jsonPayload.put("securityProperties", securityProperties);
+
+        return jsonPayload;
     }
 
     private static JSONObject createConnectionProperty(String[] header, String[] values) {
@@ -73,6 +92,10 @@ public class ReadfromCSV {
         securityProperty.put("propertyValue", getValueForHeader(header, values, "Username"));
         securityProperty.put("requiredFlag", true);
 
+        return securityProperty;
+    }
+
+    private static JSONObject createPasswordProperty(String[] header, String[] values) {
         JSONObject passwordProperty = new JSONObject();
         passwordProperty.put("displayName", "Password");
         passwordProperty.put("hasAttachment", false);
@@ -84,11 +107,7 @@ public class ReadfromCSV {
         passwordProperty.put("propertyValue", getValueForHeader(header, values, "Password"));
         passwordProperty.put("requiredFlag", true);
 
-        JSONArray securityProperties = new JSONArray();
-        securityProperties.put(securityProperty);
-        securityProperties.put(passwordProperty);
-
-        return securityProperty;
+        return passwordProperty;
     }
 
     private static String getValueForHeader(String[] header, String[] values, String headerName) {
@@ -99,15 +118,6 @@ public class ReadfromCSV {
         return "";
     }
 
-    private static JSONObject createJsonPayload(JSONArray connectionProperties, JSONArray securityProperties) {
-        JSONObject jsonPayload = new JSONObject();
-        jsonPayload.put("connectionProperties", connectionProperties);
-        jsonPayload.put("securityPolicy", "BASIC_AUTH");
-        jsonPayload.put("securityProperties", securityProperties);
-
-        return jsonPayload;
-    }
-
     private static int getIndex(String[] array, String value) {
         for (int i = 0; i < array.length; i++) {
             if (array[i].equals(value)) {
@@ -115,5 +125,30 @@ public class ReadfromCSV {
             }
         }
         return -1;
+    }
+
+    private static void executeCurlCommand(JSONObject jsonPayload) {
+        String authorization = "ZGV2b3BzX3VzZXI6T2ljX0plbmtpbnMjMjAyMw==";
+        String endpoint = "https://testinstance-idevjxz332qf-ia.integration.ocp.oraclecloud.com/ic/api/integration/v1/connections/NEWREPOCON";
+
+        String curlCommand = String.format(
+            "curl --header \"Authorization: Basic %s\" --header \"X-HTTP-Method-Override: PATCH\" --header \"Content-Type: application/json\" -d '%s' %s",
+            authorization,
+            jsonPayload.toString(),
+            endpoint
+        );
+
+        try {
+            ProcessBuilder processBuilder = new ProcessBuilder(curlCommand.split(" "));
+            Process process = processBuilder.start();
+            int exitCode = process.waitFor();
+            if (exitCode == 0) {
+                System.out.println("CURL command executed successfully.");
+            } else {
+                System.out.println("CURL command execution failed with exit code: " + exitCode);
+            }
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 }
