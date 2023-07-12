@@ -1,17 +1,19 @@
-pipeline
-{
-	agent any
-	
-		
-
-        stage('Configuring a connection'){
+pipeline {
+    agent any
+    stages {
+        stage('User Input') {
             steps {
-				script{
-					bat " java curlCommand "C:/Docs/Git/NewRepo""
-				}
+                script {
+                    // Prompt the user for the CSV file name and store it in a variable
+                    def csvFileName = input(message: 'Enter the CSV file name:', parameters: [string(defaultValue: '', description: 'CSV file name', name: 'CSVFileName')])
+
+                    // Pass the CSV file name as an argument to the Java program
+                    bat "javac -cp lib/json-simple-1.1.1.jar implement2Payload.java"
+                    bat "java -cp .;lib/json-simple-1.1.1.jar implement2Payload ${csvFileName}"
+                }
             }
         }
-		
-		
     }
 }
+
+C:\Docs\Git\NewRepo\ConnectionDetails.csv
