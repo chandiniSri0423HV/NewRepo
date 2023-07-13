@@ -1,23 +1,31 @@
+
 pipeline {
     agent any
-    parameters {
-        booleanParam(name: 'Activate_Integration', defaultValue: false, description: 'Check the box if you want Activate the integration after importing')
-    }
-    stages {
-        stage('Activation') {
-            steps {
-				def integName = params.Integration_Identifier.toString()
-                script {
-                    if (params.Activate_Integration) {
-                        // Perform action when the checkbox is checked
-						bat 'javac ActivateIntegration.java'
-						bat 'start java ActivateIntegration ${params.INSTANCE_URL} ${params.INTEGRATION_IDENTIFIER}'
 
-                    } else {
-                        // Perform a different action when the checkbox is not checked
-						bat 'javac DeactivateIntegration.java'
-						bat 'start java DeactivateIntegration ${params.INSTANCE_URL} ${params.INTEGRATION_IDENTIFIER}'               
-					}
+    parameters {
+        booleanParam(name: 'ActivateIntegration', defaultValue: false, description: 'Activate Integration')
+        stringParam(name: 'instanceUrl', defaultValue: '', description: 'Instance URL')
+        stringParam(name: 'integrationIdentifier', defaultValue: '', description: 'Integration Identifier')
+    }
+
+    stages {
+        stage('Build') {
+            steps {
+                script {
+                    // Compile Java code
+                    sh 'javac ActivateDeactivateIntegration.java'
+                }
+            }
+        }
+
+        stage('Execute') {
+            steps {
+                script {
+                    // Set the action based on the activation checkbox
+                    def action = params.ActivateIntegration ? 'ACTIVATE' : 'CONFIGURED'
+
+                    // Execute Java code with user inputs
+                    sh "java ActivateDeactivateIntegration '${params.instanceUrl}' '${params.integrationIdentifier}' '${action}'"
                 }
             }
         }

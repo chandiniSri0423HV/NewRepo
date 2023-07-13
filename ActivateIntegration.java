@@ -4,12 +4,18 @@ import java.io.InputStreamReader;
 
 public class ActivateIntegration {
     public static void main(String[] args) {
-        // Read instance URL and integration identifier from command-line arguments
+        if (args.length < 3) {
+            System.out.println("Usage: java ActivateDeactivateIntegration <instanceURL> <integrationIdentifier> <action>");
+            return;
+        }
+        
+        // Read instance URL, integration identifier, and action from command-line arguments
         String instanceUrl = args[0];
         String integrationIdentifier = args[1];
+        String action = args[2];
 
         // JSON payload
-        String jsonPayload = "{\"status\": \"CONFIGURED\"}";
+        String jsonPayload = "{\"status\": \"" + action + "\"}";
 
         // Escape special characters in JSON
         String escapedJsonPayload = jsonPayload.replace("\"", "\\\"");

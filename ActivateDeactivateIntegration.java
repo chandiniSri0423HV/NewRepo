@@ -2,19 +2,21 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-public class DeactivateIntegration {
+public class ActivateDeactivateIntegration {
     public static void main(String[] args) {
-        if (args.length < 2) {
-            System.out.println("Usage: java DeactivateIntegration <instanceURL> <integrationIdentifier>");
-            return;
-        }
-        
-        // Read instance URL and integration identifier from command-line arguments
+        // Get input parameters from command line arguments
         String instanceUrl = args[0];
         String integrationIdentifier = args[1];
+        String action = args[2];
 
-        // JSON payload
-        String jsonPayload = "{\"status\": \"CONFIGURED\"}";
+        // JSON payload for activation
+        String activatePayload = "{\"status\": \"ACTIVATE\"}";
+
+        // JSON payload for configuration
+        String configurePayload = "{\"status\": \"CONFIGURED\"}";
+
+        // Determine the JSON payload based on the action
+        String jsonPayload = action.equals("ACTIVATE") ? activatePayload : configurePayload;
 
         // Escape special characters in JSON
         String escapedJsonPayload = jsonPayload.replace("\"", "\\\"");
