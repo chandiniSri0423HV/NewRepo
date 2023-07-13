@@ -1,13 +1,14 @@
 pipeline {
     agent any
     parameters {
-        booleanParam(name: 'ActivateCheckbox', defaultValue: false, description: 'Activate Checkbox')
+        booleanParam(name: 'Activate_Integration', defaultValue: false, description: 'Check the box if you want Activate the integration after importing')
     }
     stages {
         stage('Activation') {
             steps {
+				def integName = params.Integration_Identifier.toString()
                 script {
-                    if (params.ActivateCheckbox) {
+                    if (params.Activate_Integration) {
                         // Perform action when the checkbox is checked
 						bat 'javac ActivateIntegration.java'
 						bat 'start java ActivateIntegration ${params.INSTANCE_URL} ${params.INTEGRATION_IDENTIFIER}'
