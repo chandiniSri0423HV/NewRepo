@@ -4,8 +4,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
-
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 public class ConUpdate {
@@ -41,7 +40,7 @@ public class ConUpdate {
                 securityProperties.add(securityProperty);
 
                 // Execute the curl command
-                executeCurlCommand(connectionProperty, securityProperty);
+                executeCurlCommand(connectionProperties, securityProperties);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -50,7 +49,6 @@ public class ConUpdate {
 
     private static JSONObject createConnectionProperty(String[] header, String[] values) {
         JSONObject connectionProperty = new JSONObject();
-        // ... your code to create the connection property JSONObject ...
         connectionProperty.put("displayName", "Connection URL");
         connectionProperty.put("hasAttachment", false);
         connectionProperty.put("hiddenFlag", false);
@@ -66,7 +64,6 @@ public class ConUpdate {
 
     private static JSONObject createSecurityProperty(String[] header, String[] values) {
         JSONObject securityProperty = new JSONObject();
-        // ... your code to create the security property JSONObject ...
         securityProperty.put("displayName", "Username");
         securityProperty.put("hasAttachment", false);
         securityProperty.put("hiddenFlag", false);
@@ -79,43 +76,6 @@ public class ConUpdate {
 
         return securityProperty;
     }
-      private static String validateAndFormatValueForHeader(String[] header, String[] values, String headerName) {
-        // Find the index of the header in the array
-        int index = -1;
-        for (int i = 0; i < header.length; i++) {
-            if (header[i].equals(headerName)) {
-                index = i;
-                break;
-            }
-        }
-        if (index >= 0 && index < values.length) {
-            String value = values[index];
-
-            // Validate and format the value based on its data type
-            if (headerName.equals("ConnectionURL")) {
-                // Validate the URL format
-                if (!isValidUrl(value)) {
-                    // Handle invalid URL format
-                    System.out.println("Invalid URL format for ConnectionURL: " + value);
-                    return "";
-                }
-            } else if (headerName.equals("Username")) {
-                // Perform any other validations or formatting for the Username value
-                // Add your validation and formatting logic here
-            }
-
-            return value;
-        } else {
-            return "";
-        }
-    }
-
-    private static boolean isValidUrl(String url) {
-        // Use a regex pattern to validate the URL format
-        String urlPattern = "^https?://.*$";
-        return Pattern.matches(urlPattern, url);
-    }
-
 
     private static String getValueForHeader(String[] header, String[] values, String headerName) {
         for (int i = 0; i < header.length; i++) {
@@ -126,14 +86,14 @@ public class ConUpdate {
         return "";
     }
 
-    private static void executeCurlCommand(JSONObject connectionProperty, JSONObject securityProperty) {
+    private static void executeCurlCommand(List<JSONObject> connectionProperties, List<JSONObject> securityProperties) {
         String authorization = "ZGV2b3BzX3VzZXI6T2ljX0plbmtpbnMjMjAyMw==";
         String endpoint = "https://testinstance-idevjxz332qf-ia.integration.ocp.oraclecloud.com/ic/api/integration/v1/connections/NEWREPOCON";
 
         JSONObject jsonPayload = new JSONObject();
-        jsonPayload.put("connectionProperties", connectionProperty);
+        jsonPayload.put("connectionProperties", connectionProperties);
         jsonPayload.put("securityPolicy", "BASIC_AUTH");
-        jsonPayload.put("securityProperties", securityProperty);
+        jsonPayload.put("securityProperties", securityProperties);
 
         String curlCommand = String.format(
                 "curl --header \"Authorization: Basic %s\" --header \"X-HTTP-Method-Override: PATCH\" --header \"Content-Type: application/json\" -d '%s' %s",
@@ -141,38 +101,37 @@ public class ConUpdate {
                 jsonPayload.toString(),
                 endpoint
         );
-        
         System.out.println("Curl Command: " + curlCommand);
 
         // Execute the curl command
-         try {
-        ProcessBuilder processBuilder = new ProcessBuilder(curlCommand.split(" "));
-        Process process = processBuilder.start();
-        
-        // Capture the response output
-        StringBuilder responseOutput = new StringBuilder();
-        BufferedReader responseReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-        String responseLine;
-        while ((responseLine = responseReader.readLine()) != null) {
-            responseOutput.append(responseLine).append("\n");
-        }
-        
-        // Capture the error output
-        StringBuilder errorOutput = new StringBuilder();
-        BufferedReader errorReader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-        String errorLine;
-        while ((errorLine = errorReader.readLine()) != null) {
-            errorOutput.append(errorLine).append("\n");
-        }
+        try {
+            ProcessBuilder processBuilder = new ProcessBuilder(curlCommand.split(" "));
+            Process process = processBuilder.start();
 
-        int exitCode = process.waitFor();
-        if (exitCode == 0) {
-            System.out.println("CURL command executed successfully.");
-            System.out.println("Response Output:\n" + responseOutput.toString());
-        } else {
-            System.out.println("CURL command execution failed with exit code: " + exitCode);
-            System.out.println("Error Output:\n" + errorOutput.toString());
-        }
+            // Capture the response output
+            StringBuilder responseOutput = new StringBuilder();
+            BufferedReader responseReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            String responseLine;
+            while ((responseLine = responseReader.readLine()) != null) {
+                responseOutput.append(responseLine).append("\n");
+            }
+
+            // Capture the error output
+            StringBuilder errorOutput = new StringBuilder();
+            BufferedReader errorReader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+            String errorLine;
+            while ((errorLine = errorReader.readLine()) != null) {
+                errorOutput.append(errorLine).append("\n");
+            }
+
+            int exitCode = process.waitFor();
+            if (exitCode == 0) {
+                System.out.println("CURL command executed successfully.");
+                System.out.println("Response Output:\n" + responseOutput.toString());
+            } else {
+                System.out.println("CURL command execution failed with exit code: " + exitCode);
+                System.out.println("Error Output:\n" + errorOutput.toString());
+            }
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
