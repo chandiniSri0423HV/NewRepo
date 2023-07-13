@@ -15,9 +15,7 @@ pipeline {
 						def deployIntegCmd = "curl --location \"${integURL}\" --silent --user ${params.Username}:${params.Password} --form \"file=@\\\"${params.IARFileName}\\\"\""
 						bat(deployIntegCmd)
                     } else if (selectedOption == 'Replace') {
-						def integName = params.Integration_Identifier.toString()
-						def deactivateIntegrationCmd = "curl --user ${params.Username}:${params.Password} --header \"Content-Type: application/json\" --header \"X-HTTP-Method-Override: PATCH\" -d @${params.DeactivationJsonFile} -d 'enableAsyncActivationMode=true' \"${params.InstanceURL}/ic/api/integration/v1/integrations/${integName}\""
-                        bat(deactivateIntegrationCmd)
+						
                         echo 'Replacing an integration'
 						def updateIntegFileCmd = "curl -X PUT --user ${params.Username}:${params.Password} --header \"Accept:application/json\" --form \"file=@\\\"${params.IARFileName}\\\"\" --form type=application/octet-stream ${params.InstanceURL}/ic/api/integration/v1/integrations/archive"
 						bat(updateIntegFileCmd)
