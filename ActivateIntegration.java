@@ -12,7 +12,7 @@ public class ActivateIntegration {
         String escapedJsonPayload = jsonPayload.replace("\"", "\\\"");
 
         // Curl command
-        String curlCommand = "curl --header \"Authorization: Basic ZGV2b3BzX3VzZXI6T2ljX0plbmtpbnMjMjAyMw==\" --header \"Content-Type: application/json\" --header \"X-HTTP-Method-Override: PATCH\" -d \"" + escapedJsonPayload + "\" --location \"https://testinstance-idevjxz332qf-ia.integration.ocp.oraclecloud.com/ic/api/integration/v1/integrations/NEWINTEGRATION_NEWREPO|01.00.0000\"";
+        String curlCommand = "curl -X POST -H \"Authorization: Basic ZGV2b3BzX3VzZXI6T2ljX0plbmtpbnMjMjAyMw==\" -H \"Content-Type: application/json\" -H \"X-HTTP-Method-Override: PATCH\" -d \"" + escapedJsonPayload + "\" \"https://testinstance-idevjxz332qf-ia.integration.ocp.oraclecloud.com/ic/api/integration/v1/integrations/NEWINTEGRATION_NEWREPO|01.00.0000\"";
 
         try {
             // Execute curl command
