@@ -1,14 +1,22 @@
 pipeline {
     agent any
-
+    parameters {
+        booleanParam(name: 'ActivateCheckbox', defaultValue: false, description: 'Activate Checkbox')
+    }
     stages {
-        stage('Deactivate Integration') {
+        stage('Perform Action') {
             steps {
-                // Compile the Java code
-                sh 'javac DeactivateIntegration.java'
+                script {
+                    if (params.ActivateCheckbox) {
+                        // Perform action when the checkbox is checked
+						bat 'javac ActivateIntegration.java'
+						bat 'start java ActivateIntegration'
 
-                // Run the Java code
-                sh 'java DeactivateIntegration'
+                    } else {
+                        // Perform a different action when the checkbox is not checked
+						bat 'javac DeactivateIntegration.java'
+						bat 'start java DeactivateIntegration'                    }
+                }
             }
         }
     }
