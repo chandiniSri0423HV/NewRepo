@@ -4,14 +4,15 @@ pipeline {
     stages {
         stage('Build') {
             steps {
-                // Compile Java code
-                sh 'javac CurlCommandExecutor.java'
+                // Add your build steps here
+                bat 'javac ActivateIntegration.java'
             }
         }
+
         stage('Execute') {
             steps {
-                // Run Java code
-                sh 'java CurlCommandExecutor'
+                // Add your execution steps here
+                bat 'start java ActivateIntegration'
             }
         }
     }
