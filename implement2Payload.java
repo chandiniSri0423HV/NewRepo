@@ -31,7 +31,7 @@ public class implement2Payload {
                 JSONObject jsonPayload = createJsonPayload(header, values);
 
                 System.out.println("Batch " + row);
-                System.out.println(jsonPayload.toString());
+                System.out.println(jsonPayload);
                 System.out.println();
 
                 executeCurlCommand(jsonPayload);
@@ -121,8 +121,8 @@ public class implement2Payload {
     }
 
     private static void executeCurlCommand(JSONObject jsonPayload) {
-        String authorization = "ZGV2b3BzX3VzZXI6T2ljX0plbmtpbnMjMjAyMw==";
-        String endpoint = "https://testinstance-idevjxz332qf-ia.integration.ocp.oraclecloud.com/ic/api/integration/v1/connections/NEWREPOCON";
+        String authorization = "${Devops_user}:${Oic_Jenkins#2023}";
+        String endpoint = "https://testinstance-idevjxz332qf-ia.integration.ocp.oraclecloud.com/ic/api/integration/v1/connections/NEWRCON";
 
         String curlCommand = String.format(
                 "curl --header \"Authorization: Basic %s\" --header \"X-HTTP-Method-Override: PATCH\" --header \"Content-Type: application/json\" -d '%s' %s",
