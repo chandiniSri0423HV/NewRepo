@@ -1,20 +1,18 @@
-//package ReleaseManagement;
-
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Scanner;
-
-import org.json.simple.JSONArray;
+import java.util.ArrayList;
+import java.util.HashMap;
 import org.json.simple.JSONObject;
 
 public class implement2Payload {
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
+        if (args.length != 1) {
+            System.out.println("CSV file name is missing.");
+            return;
+        }
 
-        System.out.print("Enter the CSV file name: ");
-        String csvFileName = scanner.nextLine();
-        String csvFilePath = csvFileName; // Assuming the CSV file is in the same directory as the Java file
+        String csvFilePath = args[0];
 
         try (BufferedReader br = new BufferedReader(new FileReader(csvFilePath))) {
             String headerLine = br.readLine();
@@ -42,31 +40,25 @@ public class implement2Payload {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        scanner.close();
     }
 
     private static JSONObject createJsonPayload(String[] header, String[] values) {
-        JSONArray connectionProperties = new JSONArray();
-        JSONArray securityProperties = new JSONArray();
+        ArrayList<JSONObject> connectionProperties = new ArrayList<>();
+        ArrayList<JSONObject> securityProperties = new ArrayList<>();
+        connectionProperties.add(createConnectionProperty(header, values));
+        securityProperties.add(createSecurityProperty(header, values));
+        securityProperties.add(createPasswordProperty(header, values));
 
-        JSONObject connectionProperty = createConnectionProperty(header, values);
-        connectionProperties.put(connectionProperty);
-        JSONObject securityProperty = createSecurityProperty(header, values);
-        securityProperties.put(securityProperty);
-        JSONObject passwordProperty = createPasswordProperty(header, values);
-        securityProperties.put(passwordProperty);
-
-        JSONObject jsonPayload = new JSONObject();
+        HashMap<String, Object> jsonPayload = new HashMap<>();
         jsonPayload.put("connectionProperties", connectionProperties);
         jsonPayload.put("securityPolicy", "BASIC_AUTH");
         jsonPayload.put("securityProperties", securityProperties);
 
-        return jsonPayload;
+        return new JSONObject(jsonPayload);
     }
 
     private static JSONObject createConnectionProperty(String[] header, String[] values) {
-        JSONObject connectionProperty = new JSONObject();
+        HashMap<String, Object> connectionProperty = new HashMap<>();
         connectionProperty.put("displayName", "Connection URL");
         connectionProperty.put("hasAttachment", false);
         connectionProperty.put("hiddenFlag", false);
@@ -77,11 +69,11 @@ public class implement2Payload {
         connectionProperty.put("propertyValue", getValueForHeader(header, values, "ConnectionURL"));
         connectionProperty.put("requiredFlag", true);
 
-        return connectionProperty;
+        return new JSONObject(connectionProperty);
     }
 
     private static JSONObject createSecurityProperty(String[] header, String[] values) {
-        JSONObject securityProperty = new JSONObject();
+        HashMap<String, Object> securityProperty = new HashMap<>();
         securityProperty.put("displayName", "Username");
         securityProperty.put("hasAttachment", false);
         securityProperty.put("hiddenFlag", false);
@@ -92,11 +84,11 @@ public class implement2Payload {
         securityProperty.put("propertyValue", getValueForHeader(header, values, "Username"));
         securityProperty.put("requiredFlag", true);
 
-        return securityProperty;
+        return new JSONObject(securityProperty);
     }
 
     private static JSONObject createPasswordProperty(String[] header, String[] values) {
-        JSONObject passwordProperty = new JSONObject();
+        HashMap<String, Object> passwordProperty = new HashMap<>();
         passwordProperty.put("displayName", "Password");
         passwordProperty.put("hasAttachment", false);
         passwordProperty.put("hiddenFlag", false);
@@ -107,7 +99,7 @@ public class implement2Payload {
         passwordProperty.put("propertyValue", getValueForHeader(header, values, "Password"));
         passwordProperty.put("requiredFlag", true);
 
-        return passwordProperty;
+        return new JSONObject(passwordProperty);
     }
 
     private static String getValueForHeader(String[] header, String[] values, String headerName) {
@@ -132,10 +124,10 @@ public class implement2Payload {
         String endpoint = "https://testinstance-idevjxz332qf-ia.integration.ocp.oraclecloud.com/ic/api/integration/v1/connections/NEWREPOCON";
 
         String curlCommand = String.format(
-            "curl --header \"Authorization: Basic %s\" --header \"X-HTTP-Method-Override: PATCH\" --header \"Content-Type: application/json\" -d '%s' %s",
-            authorization,
-            jsonPayload.toString(),
-            endpoint
+                "curl --header \"Authorization: Basic %s\" --header \"X-HTTP-Method-Override: PATCH\" --header \"Content-Type: application/json\" -d '%s' %s",
+                authorization,
+                jsonPayload.toString(),
+                endpoint
         );
 
         try {
