@@ -19,6 +19,32 @@ pipeline {
 C:\Docs\Git\NewRepo\ConnectionDetails.csv
 
 #166 -- but not updating in the connections(instance)
+import groovy.json.JsonSlurper
+pipeline {
+    agent any
+
+    stages {
+        stage('Build') {
+            steps {
+                script {
+                    // Input step to get CSV file name from the user
+                    def csvFileName = input(
+                        id: 'userInput',
+                        message: 'Enter the CSV file name:',
+                        parameters: [string(name: 'CSVFileName', defaultValue: '', description: 'Path to the CSV file')]
+                    )
+
+                    // Build the Java code with the required classpath
+                    bat 'javac -cp lib/json-simple-1.1.1.jar ConUpdate.java'
+
+                    // Execute the Java code with the CSV file name as an argument and the classpath
+                    bat "java -cp .;lib/json-simple-1.1.1.jar ConUpdate ${csvFileName}"
+                }
+            }
+        }
+    }
+}
+
 pipeline {
     agent any
 
