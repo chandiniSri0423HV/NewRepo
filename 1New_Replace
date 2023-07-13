@@ -5,7 +5,33 @@ pipeline {
 
     }
     stages {
-        stage('Activation of Integration') {
+        stage('Import Integration') {
+            steps {
+                script {
+                    def selectedOption = "${params.Import_Method}".trim()
+                    if (selectedOption == 'New') {
+                        echo 'Performing new operation'
+                        // Add your code for new operation here
+						def integURL=(params.InstanceURL).toString()+"/ic/api/integration/v1/integrations/archive"
+						def deployIntegCmd = "curl --location \"${integURL}\" --silent --user ${params.Username}:${params.Password} --form \"file=@\\\"${params.IARFileName}\\\"\""
+						bat(deployIntegCmd)
+                    } else if (selectedOption == 'Replace') {
+                        echo 'Performing replace operation'
+                        // Add your code for replace operation here
+						def updateIntegFileCmd = "curl -X PUT --user ${params.Username}:${params.Password} --header \"Accept:application/json\" --form \"file=@\\\"${params.IARFileName}\\\"\" --form type=application/octet-stream ${params.InstanceURL}/ic/api/integration/v1/integrations/archive"
+						bat(updateIntegFileCmd)
+                    } else{
+                        echo 'No import method is selected'
+                        // Add your code for no operation here or leave it blank
+                    } 
+                }
+            }
+        
+		}
+		
+		
+        // Add other stages as needed
+		stage('Activation of Integration') {
             steps {
                 script {
 					def integName = params.Integration_Identifier.toString()
@@ -27,26 +53,8 @@ pipeline {
                 }
             }
         }
-        // Add other stages as needed
        
-        stage('New-Replace') {
-            steps {
-                script {
-                    def selectedOption = "${params.Import_Method}".trim()
-                    if (selectedOption == 'New') {
-                        echo 'Performing new operation'
-                        // Add your code for new operation here
-                    } else if (selectedOption == 'Replace') {
-                        echo 'Performing replace operation'
-                        // Add your code for replace operation here
-                    } else{
-                        echo 'No operation selected'
-                        // Add your code for no operation here or leave it blank
-                    } 
-                }
-            }
         
-		}
 
     }
 }
