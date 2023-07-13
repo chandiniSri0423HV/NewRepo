@@ -1,18 +1,21 @@
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
 public class ActivateIntegration {
     public static void main(String[] args) {
+        // Read instance URL and integration identifier from command-line arguments
+        String instanceUrl = args[0];
+        String integrationIdentifier = args[1];
+
         // JSON payload
-        String jsonPayload = "{\"status\": \"ACTIVATED\"}";
+        String jsonPayload = "{\"status\": \"CONFIGURED\"}";
 
         // Escape special characters in JSON
         String escapedJsonPayload = jsonPayload.replace("\"", "\\\"");
 
         // Curl command
-        String curlCommand = "curl -X POST -H \"Authorization: Basic ZGV2b3BzX3VzZXI6T2ljX0plbmtpbnMjMjAyMw==\" -H \"Content-Type: application/json\" -H \"X-HTTP-Method-Override: PATCH\" -d \"" + escapedJsonPayload + "\" \"https://testinstance-idevjxz332qf-ia.integration.ocp.oraclecloud.com/ic/api/integration/v1/integrations/NEWINTEGRATION_NEWREPO|01.00.0000\"";
+        String curlCommand = "curl -X POST --header \"Authorization: Basic ZGV2b3BzX3VzZXI6T2ljX0plbmtpbnMjMjAyMw==\" --header \"Content-Type: application/json\" --header \"X-HTTP-Method-Override: PATCH\" -d \"" + escapedJsonPayload + "\" -d 'enableAsyncActivationMode=true' \"" + instanceUrl + "/ic/api/integration/v1/integrations/" + integrationIdentifier + "\"";
 
         try {
             // Execute curl command

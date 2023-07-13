@@ -4,7 +4,7 @@ pipeline {
         booleanParam(name: 'ActivateCheckbox', defaultValue: false, description: 'Activate Checkbox')
     }
     stages {
-        stage('Perform Action') {
+        stage('Activation') {
             steps {
                 script {
                     if (params.ActivateCheckbox) {
