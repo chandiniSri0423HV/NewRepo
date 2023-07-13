@@ -8,6 +8,8 @@ public class ActivateDeactivateIntegration {
         String instanceUrl = args[0];
         String integrationIdentifier = args[1];
         String action = args[2];
+        String username = args[3];
+        String password = args[4];
 
         // JSON payload for activation
         String activatePayload = "{\"status\": \"ACTIVATE\"}";
@@ -22,7 +24,7 @@ public class ActivateDeactivateIntegration {
         String escapedJsonPayload = jsonPayload.replace("\"", "\\\"");
 
         // Curl command
-        String curlCommand = "curl -X POST --header \"Authorization: Basic ZGV2b3BzX3VzZXI6T2ljX0plbmtpbnMjMjAyMw==\" --header \"Content-Type: application/json\" --header \"X-HTTP-Method-Override: PATCH\" -d \"" + escapedJsonPayload + "\" -d 'enableAsyncActivationMode=true' \"" + instanceUrl + "/ic/api/integration/v1/integrations/" + integrationIdentifier + "\"";
+        String curlCommand = "curl -X POST --user " + username + ":" + password + " --header \"Content-Type: application/json\" --header \"X-HTTP-Method-Override: PATCH\" -d \"" + escapedJsonPayload + "\" -d 'enableAsyncActivationMode=true' \"" + instanceUrl + "/ic/api/integration/v1/integrations/" + integrationIdentifier + "\"";
 
         try {
             // Execute curl command
