@@ -1,10 +1,18 @@
+package ReleaseManagement;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
-import org.json.simple.JSONArray;
+
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpStatus;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPatch;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.json.simple.JSONObject;
 
 public class ConUpdate {
@@ -38,10 +46,10 @@ public class ConUpdate {
 
                 JSONObject securityProperty = createSecurityProperty(header, values);
                 securityProperties.add(securityProperty);
-
-                // Execute the curl command
-                executeCurlCommand(connectionProperties, securityProperties);
             }
+
+            // Execute the HTTP PATCH request
+            executePatchRequest(connectionProperties, securityProperties);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -84,7 +92,7 @@ public class ConUpdate {
         return "";
     }
 
-    private static void executeCurlCommand(List<JSONObject> connectionProperties, List<JSONObject> securityProperties) {
+    private static void executePatchRequest(List<JSONObject> connectionProperties, List<JSONObject> securityProperties) {
         String authorization = "ZGV2b3BzX3VzZXI6T2ljX0plbmtpbnMjMjAyMw==";
         String endpoint = "https://testinstance-idevjxz332qf-ia.integration.ocp.oraclecloud.com/ic/api/integration/v1/connections/NEWREPOCON";
 
@@ -95,44 +103,25 @@ public class ConUpdate {
 
         String jsonPayload = payloadObject.toJSONString();
 
-        String curlCommand = String.format(
-                "curl --header \"Authorization: Basic %s\" --header \"X-HTTP-Method-Override: PATCH\" --header \"Content-Type: application/json\" -d '%s' %s",
-                authorization,
-                jsonPayload,
-                endpoint
-        );
-        System.out.println("Curl Command: " + curlCommand);
+        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+            HttpPatch httpPatch = new HttpPatch(endpoint);
+            httpPatch.addHeader("Authorization", "Basic " + authorization);
+            httpPatch.addHeader("X-HTTP-Method-Override", "PATCH");
+            httpPatch.addHeader("Content-Type", "application/json");
 
-        // Execute the curl command
-        try {
-            ProcessBuilder processBuilder = new ProcessBuilder(curlCommand.split(" "));
-            Process process = processBuilder.start();
+            StringEntity requestEntity = new StringEntity(jsonPayload, ContentType.APPLICATION_JSON);
+            httpPatch.setEntity(requestEntity);
 
-            // Capture the response output
-            StringBuilder responseOutput = new StringBuilder();
-            BufferedReader responseReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            String responseLine;
-            while ((responseLine = responseReader.readLine()) != null) {
-                responseOutput.append(responseLine).append("\n");
-            }
-
-            // Capture the error output
-            StringBuilder errorOutput = new StringBuilder();
-            BufferedReader errorReader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-            String errorLine;
-            while ((errorLine = errorReader.readLine()) != null) {
-                errorOutput.append(errorLine).append("\n");
-            }
-
-            int exitCode = process.waitFor();
-            if (exitCode == 0) {
-                System.out.println("CURL command executed successfully.");
-                System.out.println("Response Output:\n" + responseOutput.toString());
+            CloseableHttpResponse response = httpClient.execute(httpPatch);
+            int statusCode = response.getStatusLine().getStatusCode();
+            if (statusCode == HttpStatus.SC_OK) {
+                HttpEntity responseEntity = response.getEntity();
+                // Process the response entity if needed
+                System.out.println("PATCH request executed successfully.");
             } else {
-                System.out.println("CURL command execution failed with exit code: " + exitCode);
-                System.out.println("Error Output:\n" + errorOutput.toString());
+                System.out.println("PATCH request failed with status code: " + statusCode);
             }
-        } catch (IOException | InterruptedException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }

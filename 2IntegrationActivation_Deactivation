@@ -1,0 +1,18 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Build') {
+            steps {
+                // Compile Java code
+                sh 'javac CurlCommandExecutor.java'
+            }
+        }
+        stage('Execute') {
+            steps {
+                // Run Java code
+                sh 'java CurlCommandExecutor'
+            }
+        }
+    }
+}
