@@ -15,6 +15,7 @@ pipeline {
 						def deployIntegCmd = "curl --location \"${integURL}\" --silent --user ${params.Username}:${params.Password} --form \"file=@\\\"${params.IARFileName}\\\"\""
 						bat(deployIntegCmd)
                     } else if (selectedOption == 'Replace') {
+						
                         echo 'Replacing an integration'
 						def updateIntegFileCmd = "curl -X PUT --user ${params.Username}:${params.Password} --header \"Accept:application/json\" --form \"file=@\\\"${params.IARFileName}\\\"\" --form type=application/octet-stream ${params.InstanceURL}/ic/api/integration/v1/integrations/archive"
 						bat(updateIntegFileCmd)
@@ -40,6 +41,26 @@ pipeline {
 						bat"""
 						curl --user ${params.Username}:${params.Password} --header "X-HTTP-Method-Override:PATCH" --header "Content-Type:application/json" -d @${params.ConnectionFileName} ${params.InstanceURL}/ic/api/integration/v1/connections/${params.ConnectionName}
 						"""
+                    } else{
+                        echo 'No import method is selected'
+                    } 
+                }
+            }
+        
+		}
+		
+		stage('Import Lookup') {
+            steps {
+                script {
+                    def selectedOption = "${params.Import_Method}".trim()
+                    if (selectedOption == 'New') {
+                        echo 'Adding new lookup'
+						def configLookupCmd = "curl -X POST --user ${params.Username}:${params.Password} -F \"file=@${params.LookupFileName}\" -F \"type=application/octet-stream\" ${params.InstanceURL}/ic/api/integration/v1/lookups/archive"
+						bat(configLookupCmd)
+                    } else if (selectedOption == 'Replace') {
+                        echo 'Replacing a lookup'
+						def updateLookupCmd = "curl -X PUT --user ${params.Username}:${params.Password} -F \"file=@${params.LookupFileName}\" -F type=application/octet-stream \"${params.InstanceURL}/ic/api/integration/v1/lookups/archive\""
+						bat(updateLookupCmd)
                     } else{
                         echo 'No import method is selected'
                     } 
