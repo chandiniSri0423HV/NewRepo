@@ -2,16 +2,13 @@ pipeline {
     agent any
 
     stages {
-        stage('Build') {
+        stage('Deactivate Integration') {
             steps {
-                // Compile Java code
-                sh 'javac CurlCommandExecutor.java'
-            }
-        }
-        stage('Execute') {
-            steps {
-                // Run Java code
-                sh 'java CurlCommandExecutor'
+                // Compile the Java code
+                sh 'javac DeactivateIntegration.java'
+
+                // Run the Java code
+                sh 'java DeactivateIntegration'
             }
         }
     }
