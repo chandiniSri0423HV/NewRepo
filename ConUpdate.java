@@ -49,31 +49,29 @@ public class ConUpdate {
 
     private static JSONObject createConnectionProperty(String[] header, String[] values) {
         JSONObject connectionProperty = new JSONObject();
-        connectionProperty.put("displayName", "Connection URL");
+        connectionProperty.put("propertyGroup", "CONNECTION_PROPS");
         connectionProperty.put("hasAttachment", false);
         connectionProperty.put("hiddenFlag", false);
-        connectionProperty.put("propertyGroup", "CONNECTION_PROPS");
-        connectionProperty.put("propertyName", "connectionUrl");
-        connectionProperty.put("propertyShortDesc", "Please make sure that this value really corresponds to the type selected above.");
-        connectionProperty.put("propertyType", "URL");
-        connectionProperty.put("propertyValue", getValueForHeader(header, values, "ConnectionURL"));
+        connectionProperty.put("propertyName", getValueForHeader(header, values, "propertyName"));
+        connectionProperty.put("displayName", getValueForHeader(header, values, "displayName"));
+        connectionProperty.put("propertyShortDesc", getValueForHeader(header, values, "propertyShortDesc"));
+        connectionProperty.put("propertyType", getValueForHeader(header, values, "propertyType"));
+        connectionProperty.put("propertyValue", getValueForHeader(header, values, "propertyValue"));
         connectionProperty.put("requiredFlag", true);
-
         return connectionProperty;
     }
 
     private static JSONObject createSecurityProperty(String[] header, String[] values) {
         JSONObject securityProperty = new JSONObject();
-        securityProperty.put("displayName", "Username");
+        securityProperty.put("propertyGroup", "CREDENTIALS");
         securityProperty.put("hasAttachment", false);
         securityProperty.put("hiddenFlag", false);
-        securityProperty.put("propertyDescription", "A username credential");
-        securityProperty.put("propertyGroup", "CREDENTIALS");
-        securityProperty.put("propertyName", "username");
-        securityProperty.put("propertyType", "STRING");
-        securityProperty.put("propertyValue", getValueForHeader(header, values, "Username"));
+        securityProperty.put("propertyDescription", getValueForHeader(header, values, "propertyDescription"));
+        securityProperty.put("propertyName", getValueForHeader(header, values, "propertyName"));
+        securityProperty.put("displayName", getValueForHeader(header, values, "displayName"));
+        securityProperty.put("propertyType", getValueForHeader(header, values, "propertyType"));
+        securityProperty.put("propertyValue", getValueForHeader(header, values, "propertyValue"));
         securityProperty.put("requiredFlag", true);
-
         return securityProperty;
     }
 
@@ -90,15 +88,17 @@ public class ConUpdate {
         String authorization = "ZGV2b3BzX3VzZXI6T2ljX0plbmtpbnMjMjAyMw==";
         String endpoint = "https://testinstance-idevjxz332qf-ia.integration.ocp.oraclecloud.com/ic/api/integration/v1/connections/NEWREPOCON";
 
-        JSONObject jsonPayload = new JSONObject();
-        jsonPayload.put("connectionProperties", connectionProperties);
-        jsonPayload.put("securityPolicy", "BASIC_AUTH");
-        jsonPayload.put("securityProperties", securityProperties);
+        JSONObject payloadObject = new JSONObject();
+        payloadObject.put("connectionProperties", connectionProperties);
+        payloadObject.put("securityProperties", securityProperties);
+        payloadObject.put("securityPolicy", "BASIC_AUTH");
+
+        String jsonPayload = payloadObject.toJSONString();
 
         String curlCommand = String.format(
                 "curl --header \"Authorization: Basic %s\" --header \"X-HTTP-Method-Override: PATCH\" --header \"Content-Type: application/json\" -d '%s' %s",
                 authorization,
-                jsonPayload.toString(),
+                jsonPayload,
                 endpoint
         );
         System.out.println("Curl Command: " + curlCommand);
