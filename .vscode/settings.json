@@ -1,6 +1,10 @@
 {
     "java.project.referencedLibraries": [
-        "lib/**/*.jar",
-        "c:\\Users\\csrisailaxmiboddu\\json-simple-1.1.1.jar"
+      "NewRepo/json-java-json-20230618.jar"
+    ],
+    "java.project.sourcePaths": [
+      ".",
+      "lib"
     ]
-}
+  }
+  
