@@ -10,19 +10,38 @@ pipeline {
                 script {
                     def selectedOption = "${params.Import_Method}".trim()
                     if (selectedOption == 'New') {
-                        echo 'Performing new operation'
-                        // Add your code for new operation here
+                        echo 'Adding new integration'
 						def integURL=(params.InstanceURL).toString()+"/ic/api/integration/v1/integrations/archive"
 						def deployIntegCmd = "curl --location \"${integURL}\" --silent --user ${params.Username}:${params.Password} --form \"file=@\\\"${params.IARFileName}\\\"\""
 						bat(deployIntegCmd)
                     } else if (selectedOption == 'Replace') {
-                        echo 'Performing replace operation'
-                        // Add your code for replace operation here
+                        echo 'Replacing an integration'
 						def updateIntegFileCmd = "curl -X PUT --user ${params.Username}:${params.Password} --header \"Accept:application/json\" --form \"file=@\\\"${params.IARFileName}\\\"\" --form type=application/octet-stream ${params.InstanceURL}/ic/api/integration/v1/integrations/archive"
 						bat(updateIntegFileCmd)
                     } else{
                         echo 'No import method is selected'
-                        // Add your code for no operation here or leave it blank
+                    } 
+                }
+            }
+        
+		}
+		
+		stage('Import Connection') {
+            steps {
+                script {
+                    def selectedOption = "${params.Import_Method}".trim()
+                    if (selectedOption == 'New') {
+                        echo 'Adding new connection'
+						bat """
+						curl --user ${params.Username}:${params.Password} --header "X-HTTP-Method-Override:PATCH" --header "Content-Type:application/json" -d @${params.ConnectionFileName} ${params.InstanceURL}/ic/api/integration/v1/connections/${params.ConnectionName}
+						"""
+                    } else if (selectedOption == 'Replace') {
+                        echo 'Replacing a connection'
+						bat"""
+						curl --user ${params.Username}:${params.Password} --header "X-HTTP-Method-Override:PATCH" --header "Content-Type:application/json" -d @${params.ConnectionFileName} ${params.InstanceURL}/ic/api/integration/v1/connections/${params.ConnectionName}
+						"""
+                    } else{
+                        echo 'No import method is selected'
                     } 
                 }
             }
