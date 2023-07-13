@@ -2,13 +2,17 @@ pipeline {
     agent any
 
     stages {
-        stage('Deactivate Integration') {
+        stage('Build') {
             steps {
-                // Compile the Java code
-                sh 'javac DeactivateIntegration.java'
+                // Add your build steps here
+                bat 'javac ActivateIntegration.java'
+            }
+        }
 
-                // Run the Java code
-                sh 'java DeactivateIntegration'
+        stage('Execute') {
+            steps {
+                // Add your execution steps here
+                bat 'start java ActivateIntegration'
             }
         }
     }
