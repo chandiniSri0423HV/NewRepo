@@ -124,7 +124,7 @@ public class implement2Payload {
         // String authorization = "ZGV2b3BzX3VzZXI6T2ljX0plbmtpbnMjMjAyMw==";
         // String endpoint = "https://testinstance-idevjxz332qf-ia.integration.ocp.oraclecloud.com/ic/api/integration/v1/connections/NEWRCON";
 
-        String curlCommand = "curl --header \"Authorization: Basic ZGV2b3BzX3VzZXI6T2ljX0plbmtpbnMjMjAyMw==\" --header \"X-HTTP-Method-Override: PATCH\" --header \"Content-Type: application/json\" -d \"https://testinstance-idevjxz332qf-ia.integration.ocp.oraclecloud.com/ic/api/integration/v1/connections/NEWRCON\"";
+        String curlCommand = "curl --header \"${Devops_user}:${Oic_Jenkins#2023}\" --header \"X-HTTP-Method-Override: PATCH\" --header \"Content-Type: application/json\" -d \"https://testinstance-idevjxz332qf-ia.integration.ocp.oraclecloud.com/ic/api/integration/v1/connections/NEWRCON\"";
                 //authorization,
               //  jsonPayload.toString(),
                 //endpoint
