@@ -1,0 +1,26 @@
+{ 
+   "connectionProperties": { 
+      "propertyGroup": "CONNECTION_PROPS",     
+      "propertyName": "connectionUrl",   
+      "propertyType": "URL",  
+      "propertyValue": "http://example.com/WeatherWS/Weather.asmx?WSDL", 
+      "requiredFlag": true
+   }, 
+   "securityPolicy": "BASIC_AUTH", 
+   "securityProperties": [
+      { 
+         "propertyGroup": "CREDENTIALS",    
+         "propertyType": "STRING",
+         "propertyName": "username",   
+         "propertyValue": "abcd7",
+         "requiredFlag": true
+      }, 
+      {
+         "propertyGroup": "CREDENTIALS",     
+         "propertyName": "password", 
+         "propertyType": "PASSWORD",
+         "propertyValue": "abc222",
+         "requiredFlag": true
+      }
+   ]  
+}

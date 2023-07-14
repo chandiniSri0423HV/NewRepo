@@ -11,37 +11,39 @@ pipeline {
                         def field2 = record[1]
                         def field3 = record[2]
                         def field4 = record[3]
-                        // Process the fields as needed
-                        echo "Field 1: ${field1}"
-                        echo "Field 2: ${field2}"
-                        echo "Field 3: ${field3}"
-                        echo "Field 4: ${field4}"
-						
-						def conProperties = '''
-									{ 
-   "connectionProperties": { 
-      "propertyGroup": "CONNECTION_PROPS",     
-      "propertyName": "targetWSDLURL",   
-      "propertyType": "WSDL_URL",  
-      "propertyValue": "${field1}" 
-   }, 
-   "securityPolicy": "BASIC_AUTH", 
-   "securityProperties":  [{ 
-      "propertyGroup": "CREDENTIALS",     
-      "propertyName": "username",   
-      "propertyValue": "${field2}"
-   }, 
-   {
-      "propertyGroup": "CREDENTIALS",     
-      "propertyName": "password", 
-      "propertyValue": "${field3}" 
-   }]  
-}
-								'''
-						def payload = conProperties.replace('\n', '').trim()
-                       //echo "${payload}"
-                        def connectionCurCmd = "curl --header \"Authorization: Basic ZGV2b3BzX3VzZXI6T2ljX0plbmtpbnMjMjAyMw==\" --header \"X-HTTP-Method-Override:PATCH\" --header \"Content-Type:application/json\" -d '${payload}' https://testinstance-idevjxz332qf-ia.integration.ocp.oraclecloud.com/ic/api/integration/v1/connections/${field4}"
-						bat(connectionCurCmd)
+                        
+                        def conProperties = """
+                            { 
+                                "connectionProperties": { 
+                                    "propertyGroup": "CONNECTION_PROPS",
+                                    "propertyName": "targetWSDLURL",
+                                    "propertyType": "WSDL_URL",
+                                    "propertyValue": "${field1}"
+                                },
+                                "securityPolicy": "BASIC_AUTH",
+                                "securityProperties": [
+                                    {
+                                        "propertyGroup": "CREDENTIALS",
+                                        "propertyName": "username",
+                                        "propertyValue": "${field2}"
+                                    },
+                                    {
+                                        "propertyGroup": "CREDENTIALS",
+                                        "propertyName": "password",
+                                        "propertyValue": "${field3}"
+                                    }
+                                ]
+                            }
+                        """
+                        def payload = conProperties.replace('\n', '').trim()
+                        writeFile file: 'payload.json', text: payload
+                        
+                        def integURL = "https://testinstance-idevjxz332qf-ia.integration.ocp.oraclecloud.com"+"/ic/api/integration/v1/connections/"+"${field4}"
+                        
+                        def response = bat(returnStdout: true, script: "curl -X POST --header \"Authorization: Basic ZGV2b3BzX3VzZXI6T2ljX0plbmtpbnMjMjAyMw==\" --header \"X-HTTP-Method-Override:PATCH\" --header \"Content-Type:application/json\" -d @payload.json ${integURL}")
+                        
+                        echo response
+                       
                     }
                 }
             }
