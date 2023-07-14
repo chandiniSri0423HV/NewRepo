@@ -41,7 +41,7 @@ pipeline {
                         if (fileName) {
                             // Execute curl command for each lookup file name
                             sh """
-                                curl -X POST --user \${Username}:\${Password} -F "file=@${fileName}" -F "type=application/octet-stream" \${instanceURL}/ic/api/integration/v1/lookups/archive
+                                curl -X POST --user \${Username}:\${Password} -F "file=@${fileName}" -F "type=application/octet-stream" ${instanceURL}/ic/api/integration/v1/lookups/archive
                             """
                         }
                     }
