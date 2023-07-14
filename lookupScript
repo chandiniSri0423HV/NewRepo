@@ -2,7 +2,6 @@ pipeline {
     parameters {
         choice(name: 'InstanceURL', choices: ['DEV', 'UAT', 'PROD'], description: 'Select the instance URL')
         string(description: 'Lookup file names (comma-separated)', name: 'fileNames')
-        choice(name: 'Import_Method', choices: ['New', 'Replace'], description: 'Select the import method')
     }
     agent any
     stages {
