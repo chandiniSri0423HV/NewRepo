@@ -1,11 +1,5 @@
 pipeline {
     agent any
-    
-    parameters {
-        string(defaultValue: '1', description: 'Number of files', name: 'NumberOfFiles')
-        string(description: 'Lookup file names (comma-separated)', name: 'LookupFileName')
-    }
-    
     stages {
         stage('Execution') {
             steps {
