@@ -1,4 +1,7 @@
 pipeline {
+	parameters {
+        choice(name: 'InstanceURL', choices: ['DEV', 'UAT', 'PROD'], description: 'Select the instance URL')
+    }
     agent any
     stages {
         stage('Execution') {
