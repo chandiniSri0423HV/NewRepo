@@ -2,6 +2,7 @@ pipeline {
     parameters {
         choice(name: 'InstanceURL', choices: ['DEV', 'UAT', 'PROD'], description: 'Select the instance URL')
         string(description: 'Lookup file names (comma-separated)', name: 'fileNames')
+        choice(name: 'Import_Method', choices: ['New', 'Replace'], description: 'Select the import method')
     }
     agent any
     stages {
@@ -32,29 +33,26 @@ pipeline {
                             return
                     }
                     def files = params.fileNames.split(',')
+                    def selectedOption = params.Import_Method.trim()
                     
                     for (int i = 0; i < files.size(); i++) {
                         def fileName = files[i].trim()
                         
-                       
-							def selectedOption = "${params.Import_Method}".trim()
-                    if (selectedOption == 'New') {
-                        echo 'Adding new lookup'
-						 if (fileName) {
-                            // Execute curl command for each lookup file name
-                            bat """
-                                curl -X POST --user ${username}:${password} -F "file=@${fileName}" -F "type=application/octet-stream" ${instanceURL}/ic/api/integration/v1/lookups/archive
-                            """
-                    } else if (selectedOption == 'Replace') {
-                        echo 'Replacing a lookup'
-						if (fileName) {
-                            // Execute curl command for each lookup file name
-                            bat """
-							curl -X PUT --user ${Username}:${Password} -F \"file=@${fileName}\" -F type=application/octet-stream \"${instanceURL}/ic/api/integration/v1/lookups/archive\"
-							"""
-                    } else {
-                        echo 'No import method is selected'
-                    }
+                        if (fileName) {
+                            // Execute curl command based on the import method
+                            if (selectedOption == 'New') {
+                                echo 'Adding new lookup'
+                                bat """
+                                    curl -X POST --user ${username}:${password} -F \"file=@${fileName}\" -F \"type=application/octet-stream\" ${instanceURL}/ic/api/integration/v1/lookups/archive
+                                """
+                            } else if (selectedOption == 'Replace') {
+                                echo 'Replacing a lookup'
+                                bat """
+                                    curl -X PUT --user ${username}:${password} -F \"file=@${fileName}\" -F \"type=application/octet-stream\" ${instanceURL}/ic/api/integration/v1/lookups/archive
+                                """
+                            } else {
+                                echo 'No import method is selected'
+                            }
                         }
                     }
                 }
