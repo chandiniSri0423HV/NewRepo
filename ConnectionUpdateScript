@@ -16,8 +16,8 @@ pipeline {
                             { 
                                 "connectionProperties": { 
                                     "propertyGroup": "CONNECTION_PROPS",
-                                    "propertyName": "targetWSDLURL",
-                                    "propertyType": "WSDL_URL",
+                                    "propertyName": "connectionUrl",
+                                    "propertyType": "URL",
                                     "propertyValue": "${field1}"
                                 },
                                 "securityPolicy": "BASIC_AUTH",
@@ -38,12 +38,11 @@ pipeline {
                         def payload = conProperties.replace('\n', '').trim()
                         writeFile file: 'payload.json', text: payload
                         
-                        def integURL = "https://testinstance-idevjxz332qf-ia.integration.ocp.oraclecloud.com"+"/ic/api/integration/v1/connections/"+"${field4}"
+                        def integURL = "https://testinstance-idevjxz332qf-ia.integration.ocp.oraclecloud.com/ic/api/integration/v1/connections/${field4}"
                         
-                        def response = bat(returnStdout: true, script: "curl -X POST --header \"Authorization: Basic ZGV2b3BzX3VzZXI6T2ljX0plbmtpbnMjMjAyMw==\" --header \"X-HTTP-Method-Override:PATCH\" --header \"Content-Type:application/json\" -d @payload.json ${integURL}")
+                        bat"""
+curl -X POST --user "Devops_user:Oic_Jenkins#2023" --header "X-HTTP-Method-Override:PATCH" --header "Content-Type:application/json" -d @payload.json "https://testinstance-idevjxz332qf-ia.integration.ocp.oraclecloud.com/ic/api/integration/v1/connections/${field4}"                        """
                         
-                        echo response
-                       
                     }
                 }
             }
