@@ -1,0 +1,24 @@
+pipeline {
+    agent any
+    stages {
+        stage('Read CSV') {
+            steps {
+                script {
+                    def csvFile = readFile('Connectiondetails.csv')
+                    def records = readCSV text: csvFile
+                    records.each { record ->
+                        def field1 = record['Field 1']
+                        def field2 = record['Field 2']
+                        def field3 = record['Field 3']
+                        def field4 = record['Field 4']
+                        def payload="{\"connectionProperties\": { \"propertyGroup\":\"CONNECTION_PROPS\",\"propertyName\": \"connectionUrl\",\"propertyType\": \"WSDL_URL\", \"propertyValue\":\""+field1+"\"}, \"securityPolicy\": \"BASIC_AUTH\", \"securityProperties\":  [{\"propertyGroup\": \"CREDENTIALS\",\"propertyName\": \"username\",\"propertyValue\":\""+field2+"\"},{\"propertyGroup\": \"CREDENTIALS\",\"propertyName\": \"password\", \"propertyValue\":\"" +field3+"\" }]}";
+                        // Process the fields as needed
+                        echo "Field 1: $field1"
+                        echo "Field 2: $field2"
+                        echo "Field 3: $field3"
+                    }
+                }
+            }
+        }
+    }
+}
