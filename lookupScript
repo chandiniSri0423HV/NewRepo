@@ -10,6 +10,29 @@ pipeline {
         stage('Execution') {
             steps {
                 script {
+					def instanceURL
+					def Username
+                    def Password
+                    switch(params.InstanceURL) {
+                        case 'DEV':
+                            instanceURL = 'https://testinstance-idevjxz332qf-ia.integration.ocp.oraclecloud.com'
+							Username = 'Devops_user'
+                            Password = 'Oic_Jenkins#2023'
+                            break
+                        case 'UAT':
+                            instanceURL = 'http://example.com/url2'
+							Username = 'username1'
+                            Password = 'password1'
+                            break
+                        case 'PROD':
+                            instanceURL = 'http://example.com/url3'
+							Username = 'username1'
+                            Password = 'password1'
+                            break
+                        default:
+                            echo 'Invalid instance URL'
+                            return
+                    }
                     def files = params.LookupFileName.split(',')
                     
                     for (int i = 0; i < files.size(); i++) {
