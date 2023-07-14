@@ -1,0 +1,31 @@
+pipeline {
+    agent any
+    
+    stages {
+        stage('Input') {
+            steps {
+                script {
+                    // Take user input for the number of lookup file names
+                    def numberOfFiles = input(
+                        message: 'Enter the number of lookup file names:',
+                        parameters: [string(defaultValue: '1', description: 'Number of files', name: 'numberOfFiles')]
+                    )
+                    
+                    // Loop for the specified number of files
+                    for (int i = 1; i <= numberOfFiles.toInteger(); i++) {
+                        // Take user input for each lookup file name
+                        def fileName = input(
+                            message: "Enter the name of lookup file ${i}:",
+                            parameters: [string(description: "Lookup file name", name: "fileName_${i}")]
+                        )
+                        
+                        // Execute curl command for each lookup file name
+                        bat """
+                            curl -X POST --user "Devops_user:Oic_Jenkins#2023" -F "file=@${fileName}" -F "type=application/octet-stream" \"https://testinstance-idevjxz332qf-ia.integration.ocp.oraclecloud.com/ic/api/integration/v1/lookups/archive\"
+                        """
+                    }
+                }
+            }
+        }
+    }
+}
