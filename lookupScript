@@ -1,28 +1,26 @@
 pipeline {
     agent any
     
+    parameters {
+        string(defaultValue: '1', description: 'Number of files', name: 'NumberOfFiles')
+        string(description: 'Lookup file names (comma-separated)', name: 'LookupFileName')
+    }
+    
     stages {
-        stage('Input') {
+        stage('Execution') {
             steps {
                 script {
-                    // Take user input for the number of lookup file names
-                    def numberOfFiles = input(
-                        message: 'Enter the number of lookup file names:',
-                        parameters: [string(defaultValue: '1', description: 'Number of files', name: 'numberOfFiles')]
-                    )
+                    def files = params.LookupFileName.split(',')
                     
-                    // Loop for the specified number of files
-                    for (int i = 1; i <= numberOfFiles.toInteger(); i++) {
-                        // Take user input for each lookup file name
-                        def fileName = input(
-                            message: "Enter the name of lookup file ${i}:",
-                            parameters: [string(description: "Lookup file name", name: "fileName_${i}")]
-                        )
+                    for (int i = 0; i < files.size(); i++) {
+                        def fileName = files[i].trim()
                         
-                        // Execute curl command for each lookup file name
-                        bat """
-                            curl -X POST --user "Devops_user:Oic_Jenkins#2023" -F "file=@${fileName}" -F "type=application/octet-stream" \"https://testinstance-idevjxz332qf-ia.integration.ocp.oraclecloud.com/ic/api/integration/v1/lookups/archive\"
-                        """
+                        if (fileName) {
+                            // Execute curl command for each lookup file name
+                            sh """
+                                curl -X POST --user \${Username}:\${Password} -F "file=@${fileName}" -F "type=application/octet-stream" \${instanceURL}/ic/api/integration/v1/lookups/archive
+                            """
+                        }
                     }
                 }
             }
